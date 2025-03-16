@@ -93,6 +93,8 @@ server-motd: |-
 
 ![motd.png](assets/motd.png)
 
+![autocomplete.png](assets/autocomplete.png)
+
 ## Commands
 
 #### Warps
