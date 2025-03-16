@@ -86,8 +86,11 @@ server-motd: |-
 ```
 
 ![message-prefix.png](assets/message-prefix.png)
+
 ![join-message.png](assets/join-message.png)
+
 ![chat-format.png](assets/chat-format.png)
+
 ![motd.png](assets/motd.png)
 
 ## Commands
