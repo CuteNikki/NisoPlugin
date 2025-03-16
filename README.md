@@ -14,6 +14,7 @@ formatting.
 - [Configuration](#configuration)
     - [PostgreSQL Database](#postgresql-database)
     - [Customizable Messages](#customizable-messages)
+- [Images](#images)
 - [Commands](#commands)
     - [Warps](#warps)
     - [Homes](#homes)
@@ -85,13 +86,25 @@ server-motd: |-
   <gray>Powered by Niso</gray>
 ```
 
+## Images
+
+Message Prefix:
+
 ![message-prefix.png](assets/message-prefix.png)
+
+Join/Leave Messages:
 
 ![join-message.png](assets/join-message.png)
 
+Chat Format:
+
 ![chat-format.png](assets/chat-format.png)
 
+Server MOTD:
+
 ![motd.png](assets/motd.png)
+
+Autocomplete:
 
 ![autocomplete.png](assets/autocomplete.png)
 
