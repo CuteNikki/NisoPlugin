@@ -1,0 +1,27 @@
+# We use PlaceholderAPI placeholders and MiniMessage formatting in this configuration file.
+
+# This prefix is used in all messages sent by the plugin.
+message-prefix: <dark_gray>[<gradient:#FF5CCC:#743296>Niso<dark_gray>] <reset>
+
+# Example message: [+] Nikki
+welcome-message: <dark_gray>[<green>+<dark_gray>] <gray>%player_name%
+leave-message: <dark_gray>[<red>-<dark_gray>] <gray>%player_name%
+
+# Example message: Nikki » Hello, world!
+chat-format: <gray>%player_name% <dark_gray>» <reset>%message%
+
+server-motd: |-
+  <b><red>A Minecraft Server</red></b>
+  <gray>Powered by Niso</gray>
+
+# Database configuration for PostgreSQL
+# CREATE DATABASE minecraft;
+# CREATE USER username WITH ENCRYPTED PASSWORD 'super_secret';
+# GRANT ALL PRIVILEGES ON DATABASE minecraft to username;
+database:
+  host: localhost
+  port: 5432
+  database: minecraft
+  user: username
+  password: super_secret
+  pool-size: 10

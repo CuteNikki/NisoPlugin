@@ -1,0 +1,20 @@
+name: niso
+version: '${project.version}'
+main: moe.niso.NisoPlugin
+api-version: '1.21'
+authors: [ Nikki Sophie B. ]
+website: https://niso.moe
+
+softdepend: [ PlaceholderAPI ]
+
+commands:
+  warp:
+    description: Teleport to any configured place
+    usage: /warp <set/delete/list/teleport> [name]
+    aliases: [ w ]
+    permission: niso.warp
+  home:
+    description: Teleport to your homes
+    usage: /home <set/delete/list/teleport> [name]
+    aliases: [ h ]
+    permission: niso.home
