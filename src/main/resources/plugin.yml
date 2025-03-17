@@ -1,4 +1,4 @@
-name: niso
+name: NisoPlugin
 version: '${project.version}'
 main: moe.niso.NisoPlugin
 api-version: '1.21'
