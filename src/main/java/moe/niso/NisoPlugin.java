@@ -7,10 +7,12 @@ import moe.niso.listeners.JoinListener;
 import moe.niso.listeners.LeaveListener;
 import moe.niso.listeners.MotdListener;
 import moe.niso.managers.DatabaseManager;
+import moe.niso.managers.VersionManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Objects;
@@ -90,6 +92,20 @@ public final class NisoPlugin extends JavaPlugin {
         registerCommands();
 
         getLogger().info("Plugin is enabled!");
+
+        final String currentVersion = VersionManager.getCurrentVersion();
+        final String newestVersion = VersionManager.getNewestVersion();
+
+        if (VersionManager.isNewerVersion(currentVersion, newestVersion)) {
+            getLogger().info("New version available (Latest: " + newestVersion + ", Current: " + currentVersion + ")!");
+            if (VersionManager.downloadUpdate()) {
+                getLogger().info("Update downloaded successfully! Restart the server to apply changes.");
+            } else {
+                getLogger().warning("Failed to download update. Check the console for errors.");
+            }
+        } else {
+            getLogger().info("Plugin is up to date! (Latest: " + newestVersion + ", Current: " + currentVersion + ")");
+        }
     }
 
     /**
@@ -119,16 +135,19 @@ public final class NisoPlugin extends JavaPlugin {
      * Register all event listeners.
      */
     private void registerEvents() {
-        getServer().getPluginManager().registerEvents(new JoinListener(), this);
-        getServer().getPluginManager().registerEvents(new LeaveListener(), this);
-        getServer().getPluginManager().registerEvents(new ChatListener(), this);
-        getServer().getPluginManager().registerEvents(new MotdListener(), this);
+        PluginManager manager = getServer().getPluginManager();
+
+        manager.registerEvents(new JoinListener(), this);
+        manager.registerEvents(new LeaveListener(), this);
+        manager.registerEvents(new ChatListener(), this);
+        manager.registerEvents(new MotdListener(), this);
 
         getLogger().info("Events registered!");
     }
 
     /**
-     * Get a command by name.
+     * Get a command by name and throw an exception if it's not found.
+     * Utility method so I don't have to write Object.requireNonNull() every time.
      *
      * @param name Command name
      * @return PluginCommand instance
