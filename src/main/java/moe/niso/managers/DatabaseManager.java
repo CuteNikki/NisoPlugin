@@ -28,14 +28,14 @@ public class DatabaseManager {
             // Load database settings from config.yml
             final String host = plugin.getConfig().getString("database.host");
             final String database = plugin.getConfig().getString("database.database");
-            final String user = plugin.getConfig().getString("database.user");
+            final String username = plugin.getConfig().getString("database.username");
             final String password = plugin.getConfig().getString("database.password");
             final int port = plugin.getConfig().getInt("database.port", 5432);
             final int poolSize = plugin.getConfig().getInt("database.pool-size", 10);
 
             HikariConfig config = new HikariConfig();
             config.setJdbcUrl("jdbc:postgresql://" + host + ":" + port + "/" + database);
-            config.setUsername(user);
+            config.setUsername(username);
             config.setPassword(password);
             config.setMaximumPoolSize(poolSize);
 

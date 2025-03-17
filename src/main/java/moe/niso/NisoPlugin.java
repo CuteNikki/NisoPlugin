@@ -6,6 +6,7 @@ import moe.niso.listeners.ChatListener;
 import moe.niso.listeners.JoinListener;
 import moe.niso.listeners.LeaveListener;
 import moe.niso.listeners.MotdListener;
+import moe.niso.managers.ConfigManager;
 import moe.niso.managers.DatabaseManager;
 import moe.niso.managers.TablistManager;
 import moe.niso.managers.VersionManager;
@@ -13,7 +14,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -25,14 +25,7 @@ public final class NisoPlugin extends JavaPlugin {
     public String logPrefixManager = "Manager -> ";
     public String logPrefixUpdater = "Updater -> ";
     private DatabaseManager databaseManager;
-    private String messagePrefix;
-    private String welcomeMessage;
-    private String leaveMessage;
-    private String chatFormat;
-    private String serverMotd;
-    private boolean debugMode;
     private TablistManager tablistManager;
-    private ConfigurationSection tablistConfig;
 
     /**
      * Get the plugin instance.
@@ -59,85 +52,25 @@ public final class NisoPlugin extends JavaPlugin {
         // Set the instance variable to this instance
         instance = this;
 
-        // Create default configuration file if it doesn't exist
-        saveDefaultConfig();
+        // Create default configuration file if it doesn't exist and check for missing/invalid values
+        ConfigManager.checkDefaultConfig();
 
-        // Check if the PostgreSQL driver is loaded and disable the plugin if it's not found
-        try {
-            Class.forName("org.postgresql.Driver");
-            getLogger().info(logPrefixDatabase + "PostgreSQL Driver loaded successfully");
-        } catch (ClassNotFoundException e) {
-            getLogger().severe(logPrefixDatabase + "PostgreSQL Driver not found: " + e.getMessage());
-            getLogger().severe(logPrefixDatabase + "Disabling plugin...");
-            Bukkit.getPluginManager().disablePlugin(this);
-            return;
-        }
+        // Without these the plugin will not work properly
+        initialiseDatabase();
+        initialisePlaceholderAPI();
 
-        // Check if PlaceholderAPI is installed and disable the plugin if it's not
-        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-            getLogger().info(logPrefixManager + "PlaceholderAPI found!");
-        } else {
-            getLogger().severe(logPrefixManager + "PlaceholderAPI is not installed!");
-            getLogger().severe(logPrefixManager + "Disabling plugin...");
-            Bukkit.getPluginManager().disablePlugin(this);
-            return;
-        }
+        // Checking for a new version
+        updateCheck();
 
-        // Cache configuration values to prevent unnecessary file access on each join, leave, etc.
-        messagePrefix = getConfig().getString("message-prefix");
-        chatFormat = getConfig().getString("chat-format");
-        welcomeMessage = getConfig().getString("welcome-message");
-        leaveMessage = getConfig().getString("leave-message");
-        serverMotd = getConfig().getString("server-motd");
-        debugMode = getConfig().getBoolean("debug-mode");
-        tablistConfig = getConfig().getConfigurationSection("tablist");
-
-        // Initialize and set up database manager
-        databaseManager = new DatabaseManager();
-        databaseManager.setupDatabase();
-        // Create tables if they don't exist
-        databaseManager.createHomesTable();
-        databaseManager.createWarpsTable();
-
-        // Initialize tablist manager
-        if (tablistConfig.getBoolean("enabled")) {
-            tablistManager = new TablistManager();
-        }
-
-        // Register events and commands
+        // Register event listeners and commands
         registerEvents();
         registerCommands();
 
+        // Start the tablist manager
+        tablistManager = new TablistManager();
+
+        // Notify that the plugin is enabled
         getLogger().info(logPrefixManager + "Plugin is enabled!");
-
-        // Check for updates
-        final String currentVersion = VersionManager.getCurrentVersion();
-        final String newestVersion = VersionManager.getNewestVersion();
-        final boolean updateAvailable = VersionManager.isNewerVersion(currentVersion, newestVersion);
-
-        if (updateAvailable) {
-            getLogger().info(logPrefixUpdater + "New version available! (Latest: " + newestVersion + ", Current: " + currentVersion + ")");
-
-            final boolean autoUpdate = getConfig().getBoolean("auto-update");
-
-            if (autoUpdate) {
-                getLogger().info(logPrefixUpdater + "Starting automatic download...");
-
-                if (VersionManager.downloadUpdate()) {
-                    getLogger().info(logPrefixUpdater + "Download successful! Restart the server to apply changes.");
-                } else {
-                    getLogger().warning(logPrefixUpdater + "Download failed! Check the console for errors.");
-                }
-
-            } else {
-                // Update is available but auto-update is disabled
-                getLogger().info(logPrefixUpdater + "Download the update at: " + VersionManager.getDownloadURL());
-            }
-
-        } else {
-            // No update available
-            getLogger().info(logPrefixUpdater + "Plugin is up to date! (Latest: " + newestVersion + ", Current: " + currentVersion + ")");
-        }
     }
 
     /**
@@ -183,6 +116,76 @@ public final class NisoPlugin extends JavaPlugin {
     }
 
     /**
+     * Initialise the database connection and create tables if they don't exist.
+     */
+    private void initialiseDatabase() {
+        // Check if the PostgreSQL driver is loaded and disable the plugin if it's not found
+        try {
+            Class.forName("org.postgresql.Driver");
+            getLogger().info(logPrefixDatabase + "PostgreSQL Driver loaded successfully");
+        } catch (ClassNotFoundException e) {
+            getLogger().severe(logPrefixDatabase + "PostgreSQL Driver not found: " + e.getMessage());
+            getLogger().severe(logPrefixDatabase + "Disabling plugin...");
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
+
+        // Initialize and set up database manager
+        databaseManager = new DatabaseManager();
+        databaseManager.setupDatabase();
+
+        // Create tables if they don't exist
+        databaseManager.createHomesTable();
+        databaseManager.createWarpsTable();
+    }
+
+    /**
+     * Initialise PlaceholderAPI and disable the plugin if it's not found.
+     */
+    private void initialisePlaceholderAPI() {
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            getLogger().info(logPrefixManager + "PlaceholderAPI found!");
+        } else {
+            getLogger().severe(logPrefixManager + "PlaceholderAPI is not installed!");
+            getLogger().severe(logPrefixManager + "Disabling plugin...");
+            Bukkit.getPluginManager().disablePlugin(this);
+        }
+    }
+
+    /**
+     * Check for updates and download the newest version if auto-update is enabled.
+     */
+    private void updateCheck() {
+        final String currentVersion = VersionManager.getCurrentVersion();
+        final String newestVersion = VersionManager.getNewestVersion();
+        final boolean updateAvailable = VersionManager.isNewerVersion(currentVersion, newestVersion);
+
+        if (updateAvailable) {
+            getLogger().info(logPrefixUpdater + "New version available! (Latest: " + newestVersion + ", Current: " + currentVersion + ")");
+
+            final boolean autoUpdate = getConfig().getBoolean("auto-update");
+
+            if (autoUpdate) {
+                getLogger().info(logPrefixUpdater + "Starting automatic download...");
+
+                if (VersionManager.downloadUpdate()) {
+                    getLogger().info(logPrefixUpdater + "Download successful! Restart the server to apply changes.");
+                } else {
+                    getLogger().warning(logPrefixUpdater + "Download failed! Check the console for errors.");
+                }
+
+            } else {
+                // Update is available but auto-update is disabled
+                getLogger().info(logPrefixUpdater + "Download the update at: " + VersionManager.getDownloadURL());
+            }
+
+        } else {
+            // No update available
+            getLogger().info(logPrefixUpdater + "Plugin is up to date! (Latest: " + newestVersion + ", Current: " + currentVersion + ")");
+        }
+    }
+
+    /**
      * Get a command by name and throw an exception if it's not found.
      * Utility method so I don't have to write Object.requireNonNull() every time.
      *
@@ -203,66 +206,12 @@ public final class NisoPlugin extends JavaPlugin {
     }
 
     /**
-     * Get the message prefix.
-     *
-     * @return Message prefix
-     */
-    public String getChatFormat() {
-        return chatFormat;
-    }
-
-    /**
-     * Get the welcome message.
-     *
-     * @return Welcome message
-     */
-    public String getWelcomeMessage() {
-        return welcomeMessage;
-    }
-
-    /**
-     * Get the leave message.
-     *
-     * @return Leave message
-     */
-    public String getLeaveMessage() {
-        return leaveMessage;
-    }
-
-    /**
-     * Get the server MOTD.
-     *
-     * @return Server MOTD
-     */
-    public String getServerMotd() {
-        return serverMotd;
-    }
-
-    /**
-     * Get the debug mode status.
-     *
-     * @return Debug mode status
-     */
-    public boolean isDebugMode() {
-        return debugMode;
-    }
-
-    /**
-     * Get the tablist configuration section.
-     *
-     * @return Tablist configuration section
-     */
-    public ConfigurationSection getTablistConfig() {
-        return tablistConfig;
-    }
-
-    /**
      * Prefix a message with the message prefix.
      *
      * @param component Component to prefix
      * @return Prefixed component
      */
     public Component prefixMessage(Component component) {
-        return MiniMessage.miniMessage().deserialize(messagePrefix).append(component);
+        return MiniMessage.miniMessage().deserialize(Objects.requireNonNull(getConfig().getString("message-prefix"))).append(component);
     }
 }
