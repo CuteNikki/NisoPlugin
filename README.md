@@ -12,15 +12,16 @@ formatting.
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Configuration](#configuration)
-    - [PostgreSQL Database](#postgresql-database)
-    - [Customizable Messages](#customizable-messages)
+  - [PostgreSQL Database](#postgresql-database)
+  - [Customizable Messages](#customizable-messages)
+  - [Default Configuration](#default-configuration)
 - [Images](#images)
 - [Commands](#commands)
-    - [Warps](#warps)
-    - [Homes](#homes)
+  - [Warps](#warps)
+  - [Homes](#homes)
 - [Permissions](#permissions)
-    - [Warps](#warps-1)
-    - [Homes](#homes-1)
+  - [Warps](#warps-1)
+  - [Homes](#homes-1)
 - [Support](#support)
 - [License](#license)
 
@@ -28,16 +29,19 @@ formatting.
 
 - **Warps**: Set and manage warp points for easy teleportation.
 - **Homes**: Allow players to set and teleport to their homes.
+- **Autocomplete**: Autocomplete commands for warps, homes and more.
 - **Customizable Server MOTD**: Set a custom Message of the Day (MOTD) using MiniMessage formatting.
 - **Customizable Join/Leave Messages**: Customize join and leave messages with MiniMessage and PlaceholderAPI support.
 - **Customizable Chat Format**: Customize the chat format using MiniMessage.
+- **Customizable Tablist**: Set a custom tablist header and footer using MiniMessage and PlaceholderAPI.
+- **Automatic Updates**: Automatically downloads the latest release of the plugin.
+- **Config Health Check**: Checks the configuration file for errors and missing values.
 
 ## Requirements
 
-- **[PaperMC](https://papermc.io/) 1.21.4**: Ensure your server is running PaperMC version 1.21.4.
-- **[PostgreSQL](https://www.postgresql.org/) Database**: A PostgreSQL database to store warps and homes.
-- **[PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/)**: For placeholders in join/leave messages
-  and chat format.
+- **[PaperMC](https://papermc.io/)**: version 1.21!
+- **[PostgreSQL Database](https://www.postgresql.org/)**: to store warps and homes.
+- **[PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/)**: for placeholders in various places.
 
 ## Installation
 
@@ -50,40 +54,97 @@ formatting.
 
 ### PostgreSQL Database
 
-Configure your PostgreSQL database connection in the `config.yml` file:
+Configure your PostgreSQL database connection in the `config.yml` file like in [this configuration](#default-configuration) shown below.
+
+### Customizable Messages
+
+Customize the server MOTD, tablist, join/leave messages, and chat format in the `config.yml` file
+using [MiniMessage](https://docs.papermc.io/misc/tools/minimessage-web-editor) formatting
+and [PlaceholderAPI](https://wiki.placeholderapi.com/) placeholders.
+
+### Default Configuration:
 
 ```yaml
+# Automatically download the latest release
+auto-update: true
+# Notify on join if a new version is available
+update-notifications: true
+
+# Debug logs
+debug: false
+
+# This prefix is used in most messages sent by the plugin
+message-prefix: <dark_gray>[<gradient:#FF5CCC:#743296>Niso<dark_gray>] <reset>
+
+# We use PlaceholderAPI placeholders and MiniMessage formatting in this configuration file.
+# Recommended placeholders to download:
+# /papi ecloud download Server
+# /papi ecloud download Player
+
+# Tablist configuration
+tablist:
+  enabled: false
+  # this is the interval in ticks to update the tablist (20 ticks = 1 second)
+  # keep this value between 20 and 1000 ticks to prevent issues
+  update-interval: 100
+  header: |-
+    <dark_gray><strikethrough> ]                                                                  [ <reset>
+    <gray>
+    <gradient:#FF5CCC:#743296>mc.niso.moe
+    <gray>
+  footer: |-
+    <gray>
+    <gray>TPS: <green>%server_tps_15% <dark_gray>| <gray>Your Ping: <green>%player_ping%ms
+    <gray>Players: <green>%server_online% <dark_gray>| <gray>Uptime: <green>%server_uptime%
+    <gray>
+    <dark_gray><strikethrough> ]                                                                  [ <reset>
+
+# Welcome Message Configuration
+welcome-message:
+  enabled: false
+  # Message sent only to the joining player
+  personal-message:
+    enabled: true
+    message: <gray>Welcome to the server, <green>%player_name%<gray>!
+  # Message broadcast to all players
+  broadcast-message:
+    enabled: true
+    message: <dark_gray>[<green>+<dark_gray>] <gray>%player_name%
+
+# Leave Message Configuration
+leave-message:
+  enabled: false
+  # Message sent to all players
+  broadcast-message:
+    enabled: true
+    message: <dark_gray>[<red>-<dark_gray>] <gray>%player_name%
+
+# Chat format Configuration
+chat-format:
+  enabled: false
+  # Example message: Nikki » Hello, world!
+  format: <gray>%player_name% <dark_gray>» <reset>%message%
+
+# Server MOTD Configuration
+server-motd:
+  enabled: false
+  first-line: <gray>                     <rainbow><b>mc.niso.moe</b></rainbow>
+  second-line: <gray>                         by Nikki</gray>
+
+# Database configuration for PostgreSQL
+#
+# Commands to create the database and user:
+# CREATE DATABASE minecraft;
+# CREATE USER username WITH ENCRYPTED PASSWORD 'super_secret';
+# GRANT ALL PRIVILEGES ON DATABASE minecraft to username;
+#
 database:
   host: localhost
   port: 5432
   database: minecraft
-  user: username
+  username: username
   password: super_secret
   pool-size: 10
-```
-
-### Customizable Messages
-
-Customize the server MOTD, join/leave messages, and chat format in the `config.yml` file
-using [MiniMessage](https://docs.papermc.io/misc/tools/minimessage-web-editor) formatting
-and [PlaceholderAPI](https://wiki.placeholderapi.com/) placeholders.
-
-Example:
-
-```yaml
-# This prefix is used in all messages sent by the plugin.
-message-prefix: <dark_gray>[<gradient:#FF5CCC:#743296>Niso<dark_gray>] <reset>
-
-# Example message: [+] Nikki
-welcome-message: <dark_gray>[<green>+<dark_gray>] <gray>%player_name%
-leave-message: <dark_gray>[<red>-<dark_gray>] <gray>%player_name%
-
-# Example message: Nikki » Hello, world!
-chat-format: <gray>%player_name% <dark_gray>» <reset>%message%
-
-server-motd: |-
-  <b><red>A Minecraft Server</red></b>
-  <gray>Powered by Niso</gray>
 ```
 
 ## Images
@@ -103,6 +164,10 @@ Chat Format:
 Server MOTD:
 
 ![motd.png](assets/motd.png)
+
+Tablist:
+
+![tablist.png](assets/tablist.png)
 
 Autocomplete:
 
