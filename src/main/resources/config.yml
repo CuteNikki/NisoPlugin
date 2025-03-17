@@ -1,3 +1,6 @@
+# Automatically download the latest release
+auto-update: true
+
 # We use PlaceholderAPI placeholders and MiniMessage formatting in this configuration file.
 
 # This prefix is used in all messages sent by the plugin.

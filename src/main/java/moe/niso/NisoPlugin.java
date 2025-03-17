@@ -98,10 +98,14 @@ public final class NisoPlugin extends JavaPlugin {
 
         if (VersionManager.isNewerVersion(currentVersion, newestVersion)) {
             getLogger().info("New version available (Latest: " + newestVersion + ", Current: " + currentVersion + ")!");
-            if (VersionManager.downloadUpdate()) {
-                getLogger().info("Update downloaded successfully! Restart the server to apply changes.");
-            } else {
-                getLogger().warning("Failed to download update. Check the console for errors.");
+
+            if (getConfig().getBoolean("auto-update")) {
+                getLogger().info("Auto-update is enabled. Downloading update...");
+                if (VersionManager.downloadUpdate()) {
+                    getLogger().info("Update downloaded successfully! Restart the server to apply changes.");
+                } else {
+                    getLogger().warning("Failed to download update. Check the console for errors.");
+                }
             }
         } else {
             getLogger().info("Plugin is up to date! (Latest: " + newestVersion + ", Current: " + currentVersion + ")");
