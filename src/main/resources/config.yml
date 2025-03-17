@@ -21,16 +21,16 @@ tablist:
   # keep this value between 20 and 1000 ticks to prevent issues
   update-interval: 100
   header: |-
-    <dark_gray><strikethrough> ]                                                                  [ <reset>
+    <dark_gray>  <strikethrough> ]                                                                  [ <reset>  <dark_gray>
     <gray>
     <gradient:#FF5CCC:#743296>mc.niso.moe
     <gray>
   footer: |-
     <gray>
     <gray>TPS: <green>%server_tps_15% <dark_gray>| <gray>Your Ping: <green>%player_ping%ms
-    <gray>Players: <green>%server_online% <dark_gray>| <gray>Uptime: <green>%server_uptime%
+    <gray>Players: <green>%server_online%<dark_gray>/<green>%server_max_players% <dark_gray>| <gray>Uptime: <green>%server_uptime%
     <gray>
-    <dark_gray><strikethrough> ]                                                                  [ <reset>
+    <dark_gray>  <strikethrough> ]                                                                  [ <reset>  <dark_gray>
 
 # Welcome Message Configuration
 welcome-message:
