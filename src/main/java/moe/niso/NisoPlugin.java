@@ -7,11 +7,13 @@ import moe.niso.listeners.JoinListener;
 import moe.niso.listeners.LeaveListener;
 import moe.niso.listeners.MotdListener;
 import moe.niso.managers.DatabaseManager;
+import moe.niso.managers.TablistManager;
 import moe.niso.managers.VersionManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -29,6 +31,8 @@ public final class NisoPlugin extends JavaPlugin {
     private String chatFormat;
     private String serverMotd;
     private boolean debugMode;
+    private TablistManager tablistManager;
+    private ConfigurationSection tablistConfig;
 
     /**
      * Get the plugin instance.
@@ -86,6 +90,7 @@ public final class NisoPlugin extends JavaPlugin {
         leaveMessage = getConfig().getString("leave-message");
         serverMotd = getConfig().getString("server-motd");
         debugMode = getConfig().getBoolean("debug-mode");
+        tablistConfig = getConfig().getConfigurationSection("tablist");
 
         // Initialize and set up database manager
         databaseManager = new DatabaseManager();
@@ -93,6 +98,11 @@ public final class NisoPlugin extends JavaPlugin {
         // Create tables if they don't exist
         databaseManager.createHomesTable();
         databaseManager.createWarpsTable();
+
+        // Initialize tablist manager
+        if (tablistConfig.getBoolean("enabled")) {
+            tablistManager = new TablistManager();
+        }
 
         // Register events and commands
         registerEvents();
@@ -138,6 +148,11 @@ public final class NisoPlugin extends JavaPlugin {
         // Close the database connection pool
         if (databaseManager != null) {
             databaseManager.closeDatabase();
+        }
+
+        // Stop the tablist manager
+        if (tablistManager != null) {
+            tablistManager.stop();
         }
 
         getLogger().info(logPrefixManager + "Plugin is disabled!");
@@ -230,6 +245,15 @@ public final class NisoPlugin extends JavaPlugin {
      */
     public boolean isDebugMode() {
         return debugMode;
+    }
+
+    /**
+     * Get the tablist configuration section.
+     *
+     * @return Tablist configuration section
+     */
+    public ConfigurationSection getTablistConfig() {
+        return tablistConfig;
     }
 
     /**
