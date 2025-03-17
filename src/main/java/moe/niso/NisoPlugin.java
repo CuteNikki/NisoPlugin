@@ -19,14 +19,16 @@ import java.util.Objects;
 
 public final class NisoPlugin extends JavaPlugin {
     private static NisoPlugin instance;
-
+    public String logPrefixDatabase = "Database -> ";
+    public String logPrefixManager = "Manager -> ";
+    public String logPrefixUpdater = "Updater -> ";
+    private DatabaseManager databaseManager;
     private String messagePrefix;
-    private String chatFormat;
     private String welcomeMessage;
     private String leaveMessage;
+    private String chatFormat;
     private String serverMotd;
-
-    private DatabaseManager databaseManager;
+    private boolean debugMode;
 
     /**
      * Get the plugin instance.
@@ -42,7 +44,7 @@ public final class NisoPlugin extends JavaPlugin {
      */
     @Override
     public void onLoad() {
-        getLogger().info("Plugin is loading...");
+        getLogger().info(logPrefixManager + "Plugin is loading...");
     }
 
     /**
@@ -59,16 +61,20 @@ public final class NisoPlugin extends JavaPlugin {
         // Check if the PostgreSQL driver is loaded and disable the plugin if it's not found
         try {
             Class.forName("org.postgresql.Driver");
-            getLogger().info("PostgreSQL Driver loaded successfully");
+            getLogger().info(logPrefixDatabase + "PostgreSQL Driver loaded successfully");
         } catch (ClassNotFoundException e) {
-            getLogger().severe("PostgreSQL Driver not found: " + e.getMessage());
-            getLogger().warning("Disabling plugin...");
+            getLogger().severe(logPrefixDatabase + "PostgreSQL Driver not found: " + e.getMessage());
+            getLogger().severe(logPrefixDatabase + "Disabling plugin...");
             Bukkit.getPluginManager().disablePlugin(this);
+            return;
         }
 
         // Check if PlaceholderAPI is installed and disable the plugin if it's not
-        if (!Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-            getLogger().warning("PlaceholderAPI is not installed! Disabling plugin...");
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            getLogger().info(logPrefixManager + "PlaceholderAPI found!");
+        } else {
+            getLogger().severe(logPrefixManager + "PlaceholderAPI is not installed!");
+            getLogger().severe(logPrefixManager + "Disabling plugin...");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
@@ -79,6 +85,7 @@ public final class NisoPlugin extends JavaPlugin {
         welcomeMessage = getConfig().getString("welcome-message");
         leaveMessage = getConfig().getString("leave-message");
         serverMotd = getConfig().getString("server-motd");
+        debugMode = getConfig().getBoolean("debug-mode");
 
         // Initialize and set up database manager
         databaseManager = new DatabaseManager();
@@ -91,24 +98,35 @@ public final class NisoPlugin extends JavaPlugin {
         registerEvents();
         registerCommands();
 
-        getLogger().info("Plugin is enabled!");
+        getLogger().info(logPrefixManager + "Plugin is enabled!");
 
+        // Check for updates
         final String currentVersion = VersionManager.getCurrentVersion();
         final String newestVersion = VersionManager.getNewestVersion();
+        final boolean updateAvailable = VersionManager.isNewerVersion(currentVersion, newestVersion);
 
-        if (VersionManager.isNewerVersion(currentVersion, newestVersion)) {
-            getLogger().info("New version available (Latest: " + newestVersion + ", Current: " + currentVersion + ")!");
+        if (updateAvailable) {
+            getLogger().info(logPrefixUpdater + "New version available! (Latest: " + newestVersion + ", Current: " + currentVersion + ")");
 
-            if (getConfig().getBoolean("auto-update")) {
-                getLogger().info("Auto-update is enabled. Downloading update...");
+            final boolean autoUpdate = getConfig().getBoolean("auto-update");
+
+            if (autoUpdate) {
+                getLogger().info(logPrefixUpdater + "Starting automatic download...");
+
                 if (VersionManager.downloadUpdate()) {
-                    getLogger().info("Update downloaded successfully! Restart the server to apply changes.");
+                    getLogger().info(logPrefixUpdater + "Download successful! Restart the server to apply changes.");
                 } else {
-                    getLogger().warning("Failed to download update. Check the console for errors.");
+                    getLogger().warning(logPrefixUpdater + "Download failed! Check the console for errors.");
                 }
+
+            } else {
+                // Update is available but auto-update is disabled
+                getLogger().info(logPrefixUpdater + "Download the update at: " + VersionManager.getDownloadURL());
             }
+
         } else {
-            getLogger().info("Plugin is up to date! (Latest: " + newestVersion + ", Current: " + currentVersion + ")");
+            // No update available
+            getLogger().info(logPrefixUpdater + "Plugin is up to date! (Latest: " + newestVersion + ", Current: " + currentVersion + ")");
         }
     }
 
@@ -122,7 +140,7 @@ public final class NisoPlugin extends JavaPlugin {
             databaseManager.closeDatabase();
         }
 
-        getLogger().info("Plugin is disabled!");
+        getLogger().info(logPrefixManager + "Plugin is disabled!");
     }
 
     /**
@@ -132,7 +150,7 @@ public final class NisoPlugin extends JavaPlugin {
         getCmd("home").setExecutor(new HomeCommand());
         getCmd("warp").setExecutor(new WarpCommand());
 
-        getLogger().info("Commands registered!");
+        getLogger().info(logPrefixManager + "Commands registered!");
     }
 
     /**
@@ -146,7 +164,7 @@ public final class NisoPlugin extends JavaPlugin {
         manager.registerEvents(new ChatListener(), this);
         manager.registerEvents(new MotdListener(), this);
 
-        getLogger().info("Events registered!");
+        getLogger().info(logPrefixManager + "Events registered!");
     }
 
     /**
@@ -203,6 +221,15 @@ public final class NisoPlugin extends JavaPlugin {
      */
     public String getServerMotd() {
         return serverMotd;
+    }
+
+    /**
+     * Get the debug mode status.
+     *
+     * @return Debug mode status
+     */
+    public boolean isDebugMode() {
+        return debugMode;
     }
 
     /**

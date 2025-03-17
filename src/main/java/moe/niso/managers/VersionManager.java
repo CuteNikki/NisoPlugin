@@ -14,6 +14,24 @@ public class VersionManager {
     private static final String repositoryOwner = "CuteNikki";
 
     /**
+     * Gets the download URL for the plugin.
+     *
+     * @return The download URL
+     */
+    public static String getDownloadURL() {
+        return "https://github.com/" + repositoryOwner + "/" + plugin.getPluginMeta().getName() + "/releases/latest/download/" + plugin.getPluginMeta().getName() + ".jar";
+    }
+
+    /**
+     * Gets the version URL for the plugin.
+     *
+     * @return The version URL
+     */
+    public static String getVersionURL() {
+        return "https://api.github.com/repos/" + repositoryOwner + "/" + plugin.getPluginMeta().getName() + "/releases/latest";
+    }
+
+    /**
      * Checks if the current version is newer than the old version.
      *
      * @param oldVersion The old version
@@ -53,8 +71,7 @@ public class VersionManager {
     public static String getNewestVersion() {
         String version = null;
         try {
-            final String urlString = "https://api.github.com/repos/" + repositoryOwner + "/" + plugin.getPluginMeta().getName() + "/releases/latest";
-            final URI uri = new URI(urlString);
+            final URI uri = new URI(getVersionURL());
             final HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Accept", "application/vnd.github.v3+json");
@@ -72,10 +89,13 @@ public class VersionManager {
                 JSONObject json = new JSONObject(content.toString());
                 version = json.getString("tag_name");
             } else {
-                plugin.getLogger().warning("Updater -> Failed to fetch latest version. Response code: " + connection.getResponseCode());
+                plugin.getLogger().warning(plugin.logPrefixUpdater + "Failed to fetch latest version. Response code: " + connection.getResponseCode());
             }
         } catch (Exception e) {
-            plugin.getLogger().severe("Updater -> Error fetching latest version: " + e.getMessage());
+            plugin.getLogger().severe(plugin.logPrefixUpdater + "Error fetching latest version: " + e.getMessage());
+            plugin.getLogger().severe(plugin.logPrefixUpdater + "Disabling plugin...");
+            Bukkit.getPluginManager().disablePlugin(plugin);
+            return "";
         }
         return version;
     }
@@ -86,30 +106,27 @@ public class VersionManager {
      * @return True if the update was downloaded successfully, false otherwise
      */
     public static boolean downloadUpdate() {
-        plugin.getLogger().info("Updater -> Downloading newest update...");
         final File file = new File("plugins/" + plugin.getPluginMeta().getName() + ".jar");
 
         if (!file.exists()) {
-            plugin.getLogger().warning("Updater -> File not found! Trying to create...");
+            plugin.getLogger().warning(plugin.logPrefixUpdater + "File not found! Trying to create...");
             try {
                 if (!file.createNewFile()) {
-                    plugin.getLogger().severe("Updater -> Failed to create file.");
-                    plugin.getLogger().warning("Disabling plugin...");
+                    plugin.getLogger().severe(plugin.logPrefixUpdater + "Failed to create file.");
+                    plugin.getLogger().severe(plugin.logPrefixUpdater + "Disabling plugin...");
                     Bukkit.getPluginManager().disablePlugin(plugin);
                     return false;
                 }
             } catch (IOException e) {
-                plugin.getLogger().severe("Updater -> Error creating file: " + e.getMessage());
-                plugin.getLogger().warning("Disabling plugin...");
+                plugin.getLogger().severe(plugin.logPrefixUpdater + "Error creating file: " + e.getMessage());
+                plugin.getLogger().severe(plugin.logPrefixUpdater + "Disabling plugin...");
                 Bukkit.getPluginManager().disablePlugin(plugin);
                 return false;
             }
         }
 
-        final String urlString = "https://github.com/" + repositoryOwner + "/" + plugin.getPluginMeta().getName() + "/releases/latest/download/" + plugin.getPluginMeta().getName() + ".jar";
-
         try {
-            final URI uri = new URI(urlString);
+            final URI uri = new URI(getDownloadURL());
             final HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
 
             connection.connect();
@@ -127,12 +144,10 @@ public class VersionManager {
             outputStream.close();
             inputStream.close();
             connection.disconnect();
-            plugin.getLogger().info("Updater -> Update downloaded successfully!");
+            plugin.getLogger().info(plugin.logPrefixUpdater + "Update downloaded successfully!");
             return true;
         } catch (IOException | URISyntaxException e) {
-            plugin.getLogger().severe("Updater -> Error downloading file: " + e.getMessage());
-            plugin.getLogger().warning("Disabling plugin...");
-            Bukkit.getPluginManager().disablePlugin(plugin);
+            plugin.getLogger().severe(plugin.logPrefixUpdater + "Error downloading file: " + e.getMessage());
             return false;
         }
     }

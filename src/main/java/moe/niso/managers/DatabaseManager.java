@@ -50,13 +50,15 @@ public class DatabaseManager {
 
             // Try getting a connection to verify that the pool is set up correctly
             try (Connection ignored = dataSource.getConnection()) {
-                plugin.getLogger().info("PostgreSQL pool initialized successfully!");
+                plugin.getLogger().info(plugin.logPrefixDatabase + "PostgreSQL pool initialized successfully!");
             } catch (SQLException e) {
-                plugin.getLogger().warning("Error establishing connection to PostgreSQL: " + e.getMessage());
+                plugin.getLogger().severe(plugin.logPrefixDatabase + "Error establishing connection to PostgreSQL: " + e.getMessage());
+                plugin.getLogger().severe(plugin.logPrefixDatabase + "Disabling plugin...");
                 Bukkit.getPluginManager().disablePlugin(plugin);
             }
         } catch (Exception e) {
-            plugin.getLogger().warning("Error initializing PostgreSQL pool: " + e.getMessage());
+            plugin.getLogger().severe(plugin.logPrefixDatabase + "Error initializing PostgreSQL pool: " + e.getMessage());
+            plugin.getLogger().severe(plugin.logPrefixDatabase + "Disabling plugin...");
             Bukkit.getPluginManager().disablePlugin(plugin);
         }
     }
@@ -68,9 +70,9 @@ public class DatabaseManager {
         if (dataSource != null && !dataSource.isClosed()) {
             try {
                 dataSource.close();
-                plugin.getLogger().info("PostgreSQL pool closed.");
+                plugin.getLogger().info(plugin.logPrefixDatabase + "PostgreSQL pool closed.");
             } catch (Exception e) {
-                plugin.getLogger().warning("Error closing PostgreSQL pool: " + e.getMessage());
+                plugin.getLogger().warning(plugin.logPrefixDatabase + "Error closing PostgreSQL pool: " + e.getMessage());
             }
         }
     }
@@ -84,10 +86,10 @@ public class DatabaseManager {
             final String homesTableSQL = "CREATE TABLE IF NOT EXISTS homes (" + "creator_uuid UUID NOT NULL, " + "home_name VARCHAR(255) NOT NULL, " + "world VARCHAR(255) NOT NULL, " + "x DOUBLE PRECISION NOT NULL, " + "y DOUBLE PRECISION NOT NULL, " + "z DOUBLE PRECISION NOT NULL, " + "pitch FLOAT NOT NULL, " + "yaw FLOAT NOT NULL, " + "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " + "PRIMARY KEY (creator_uuid, home_name)" + ");";
             try (PreparedStatement ps = connection.prepareStatement(homesTableSQL)) {
                 ps.executeUpdate();
-                plugin.getLogger().info("Homes table created (if it didn't exist).");
+                plugin.getLogger().info(plugin.logPrefixDatabase + "Homes table created (if it didn't exist).");
             }
         } catch (SQLException e) {
-            plugin.getLogger().warning("Error creating Homes table: " + e.getMessage());
+            plugin.getLogger().warning(plugin.logPrefixDatabase + "Error creating Homes table: " + e.getMessage());
         }
     }
 
@@ -100,10 +102,10 @@ public class DatabaseManager {
             final String warpsTableSQL = "CREATE TABLE IF NOT EXISTS warps (" + "warp_name VARCHAR(255) NOT NULL, " + "creator_uuid UUID NOT NULL, " + "world VARCHAR(255) NOT NULL, " + "x DOUBLE PRECISION NOT NULL, " + "y DOUBLE PRECISION NOT NULL, " + "z DOUBLE PRECISION NOT NULL, " + "pitch FLOAT NOT NULL, " + "yaw FLOAT NOT NULL, " + "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " + "PRIMARY KEY (warp_name)" + ");";
             try (PreparedStatement ps = connection.prepareStatement(warpsTableSQL)) {
                 ps.executeUpdate();
-                plugin.getLogger().info("Warps table created (if it didn't exist).");
+                plugin.getLogger().info(plugin.logPrefixDatabase + "Warps table created (if it didn't exist).");
             }
         } catch (SQLException e) {
-            plugin.getLogger().warning("Error creating Warps table: " + e.getMessage());
+            plugin.getLogger().warning(plugin.logPrefixDatabase + "Error creating Warps table: " + e.getMessage());
         }
     }
 }
