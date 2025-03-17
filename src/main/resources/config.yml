@@ -1,7 +1,13 @@
 # Automatically download the latest release
 auto-update: true
+# Notify on join if a new version is available
+update-notifications: true
+
 # Debug logs
 debug: false
+
+# This prefix is used in most messages sent by the plugin
+message-prefix: <dark_gray>[<gradient:#FF5CCC:#743296>Niso<dark_gray>] <reset>
 
 # We use PlaceholderAPI placeholders and MiniMessage formatting in this configuration file.
 # Recommended placeholders to download:
@@ -26,28 +32,49 @@ tablist:
     <gray>
     <dark_gray><strikethrough> ]                                                                  [ <reset>
 
-# This prefix is used in all messages sent by the plugin.
-message-prefix: <dark_gray>[<gradient:#FF5CCC:#743296>Niso<dark_gray>] <reset>
+# Welcome Message Configuration
+welcome-message:
+  enabled: false
+  # Message sent only to the joining player
+  personal-message:
+    enabled: true
+    message: <gray>Welcome to the server, <green>%player_name%<gray>!
+  # Message broadcast to all players
+  broadcast-message:
+    enabled: true
+    message: <dark_gray>[<green>+<dark_gray>] <gray>%player_name%
 
-# Example message: [+] Nikki
-welcome-message: <dark_gray>[<green>+<dark_gray>] <gray>%player_name%
-leave-message: <dark_gray>[<red>-<dark_gray>] <gray>%player_name%
+# Leave Message Configuration
+leave-message:
+  enabled: false
+  # Message sent to all players
+  broadcast-message:
+    enabled: true
+    message: <dark_gray>[<red>-<dark_gray>] <gray>%player_name%
 
-# Example message: Nikki » Hello, world!
-chat-format: <gray>%player_name% <dark_gray>» <reset>%message%
+# Chat format Configuration
+chat-format:
+  enabled: false
+  # Example message: Nikki » Hello, world!
+  format: <gray>%player_name% <dark_gray>» <reset>%message%
 
-server-motd: |-
-  <b><red>A Minecraft Server</red></b>
-  <gray>Powered by Niso</gray>
+# Server MOTD Configuration
+server-motd:
+  enabled: false
+  first-line: <gray>                     <rainbow><b>mc.niso.moe</b></rainbow>
+  second-line: <gray>                         by Nikki</gray>
 
 # Database configuration for PostgreSQL
+#
+# Commands to create the database and user:
 # CREATE DATABASE minecraft;
 # CREATE USER username WITH ENCRYPTED PASSWORD 'super_secret';
 # GRANT ALL PRIVILEGES ON DATABASE minecraft to username;
+#
 database:
   host: localhost
   port: 5432
   database: minecraft
-  user: username
+  username: username
   password: super_secret
   pool-size: 10

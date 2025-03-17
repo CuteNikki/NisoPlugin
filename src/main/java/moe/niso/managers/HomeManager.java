@@ -49,7 +49,7 @@ public class HomeManager {
 
             ps.executeUpdate();
 
-            if (plugin.isDebugMode()) {
+            if (plugin.getConfig().getBoolean("debug")) {
                 plugin.getLogger().info("Home set by player " + player.getName() + " (" + player.getUniqueId() + ") at world: " + worldName + " x: " + x + " y: " + y + " z:" + z + " pitch: " + pitch + " yaw: " + yaw);
             }
 
@@ -114,7 +114,7 @@ public class HomeManager {
 
             int rowsAffected = ps.executeUpdate();
 
-            if (plugin.isDebugMode()) {
+            if (plugin.getConfig().getBoolean("debug")) {
                 plugin.getLogger().info("Home deleted by player " + player.getName() + " (" + player.getUniqueId() + ") with name: " + homeName);
             }
 
@@ -145,13 +145,13 @@ public class HomeManager {
                     homes.add(rs.getString("home_name"));
                 }
             }
-
-            if (plugin.isDebugMode()) {
-                plugin.getLogger().info("Retrieved " + homes.size() + " homes for player " + player.getName() + " (" + player.getUniqueId() + "): " + homes);
-            }
         } catch (SQLException e) {
             plugin.getLogger().warning("Error getting homes from database for player " + player.getName() + ": " + e.getMessage());
             player.sendMessage(plugin.prefixMessage(Component.text("An error occurred while retrieving your homes. Please try again later.").color(NamedTextColor.RED)));
+        }
+
+        if (plugin.getConfig().getBoolean("debug")) {
+            plugin.getLogger().info("Retrieved " + homes.size() + " homes for player " + player.getName() + " (" + player.getUniqueId() + "): " + homes);
         }
 
         return homes;
@@ -165,21 +165,21 @@ public class HomeManager {
      */
     public static boolean isValidHomeName(String homeName) {
         if (homeName == null || homeName.isEmpty()) {
-            if (plugin.isDebugMode()) {
+            if (plugin.getConfig().getBoolean("debug")) {
                 plugin.getLogger().info("Home name is empty or null");
             }
             return false;
         }
 
         if (homeName.length() > 20) {
-            if (plugin.isDebugMode()) {
+            if (plugin.getConfig().getBoolean("debug")) {
                 plugin.getLogger().info("Home name is too long");
             }
             return false;
         }
 
         if (!homeName.matches("^[a-zA-Z0-9_]+$")) {
-            if (plugin.isDebugMode()) {
+            if (plugin.getConfig().getBoolean("debug")) {
                 plugin.getLogger().info("Home name contains invalid characters");
             }
             return false;

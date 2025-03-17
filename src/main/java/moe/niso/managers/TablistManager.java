@@ -15,7 +15,12 @@ public class TablistManager {
     private final BukkitTask task;
 
     public TablistManager() {
-        final ConfigurationSection tablistConfig = plugin.getTablistConfig();
+        final ConfigurationSection tablistConfig = plugin.getConfig().getConfigurationSection("tablist");
+
+        if (tablistConfig == null || !tablistConfig.getBoolean("enabled")) {
+            task = null;
+            return;
+        }
 
         int updateInterval = tablistConfig.getInt("update-interval");
 
@@ -37,7 +42,11 @@ public class TablistManager {
     }
 
     public static void updateTablist(Player player) {
-        final ConfigurationSection tablistConfig = plugin.getTablistConfig();
+        final ConfigurationSection tablistConfig = plugin.getConfig().getConfigurationSection("tablist");
+
+        if (tablistConfig == null) {
+            return;
+        }
 
         final boolean isEnabled = tablistConfig.getBoolean("enabled");
         final String header = tablistConfig.getString("header");

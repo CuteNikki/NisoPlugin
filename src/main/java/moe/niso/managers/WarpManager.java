@@ -46,6 +46,11 @@ public class WarpManager {
             ps.setFloat(8, yaw);
 
             ps.executeUpdate();
+
+            if (plugin.getConfig().getBoolean("debug")) {
+                plugin.getLogger().info("Warp set by player " + player.getName() + " (" + player.getUniqueId() + ") at world: " + worldName + " x: " + x + " y: " + y + " z:" + z + " pitch: " + pitch + " yaw: " + yaw);
+            }
+
             return true;
         } catch (SQLException e) {
             plugin.getLogger().warning("Error setting warp for player: " + e.getMessage());
@@ -91,6 +96,11 @@ public class WarpManager {
         try (Connection connection = plugin.getDatabaseManager().getDataSource().getConnection(); PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, warpName);
             ps.executeUpdate();
+
+            if (plugin.getConfig().getBoolean("debug")) {
+                plugin.getLogger().info("Warp deleted: " + warpName);
+            }
+
             return true;
         } catch (SQLException e) {
             plugin.getLogger().warning("Error deleting warp: " + e.getMessage());
@@ -106,21 +116,22 @@ public class WarpManager {
     public static List<String> getWarpNames() {
         // SQL query to retrieve all warp names
         String sql = "SELECT warp_name FROM warps;";
+        List<String> warpNames = new ArrayList<>();
 
         try (Connection connection = plugin.getDatabaseManager().getDataSource().getConnection(); PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-            List<String> warpNames = new ArrayList<>();
 
             while (rs.next()) {
                 warpNames.add(rs.getString("warp_name"));
             }
-
-            return warpNames;
-
         } catch (SQLException e) {
             plugin.getLogger().warning("Error getting warp names: " + e.getMessage());
         }
 
-        return List.of(); // No warps found
+        if (plugin.getConfig().getBoolean("debug")) {
+            plugin.getLogger().info("Retrieved " + warpNames.size() + " warp names: " + warpNames);
+        }
+
+        return warpNames;
     }
 
     /**
@@ -131,12 +142,24 @@ public class WarpManager {
      */
     public static boolean isValidWarpName(String warpName) {
         if (warpName == null || warpName.isEmpty()) {
+            if (plugin.getConfig().getBoolean("debug")) {
+                plugin.getLogger().info("Warp name is null or empty.");
+            }
             return false;
         }
         if (warpName.length() > 20) {
+            if (plugin.getConfig().getBoolean("debug")) {
+                plugin.getLogger().info("Warp name is too long.");
+            }
             return false;
         }
-        // Disallow special characters or other restrictions
-        return warpName.matches("^[a-zA-Z0-9_]+$");
+        if (!warpName.matches("^[a-zA-Z0-9_]+$")) {
+            if (plugin.getConfig().getBoolean("debug")) {
+                plugin.getLogger().info("Warp name contains invalid characters.");
+            }
+            return false;
+        }
+
+        return true;
     }
 }
