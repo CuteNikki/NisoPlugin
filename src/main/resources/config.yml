@@ -4,6 +4,27 @@ auto-update: true
 debug: false
 
 # We use PlaceholderAPI placeholders and MiniMessage formatting in this configuration file.
+# Recommended placeholders to download:
+# /papi ecloud download Server
+# /papi ecloud download Player
+
+# Tablist configuration
+tablist:
+  enabled: false
+  # this is the interval in ticks to update the tablist (20 ticks = 1 second)
+  # keep this value between 20 and 1000 ticks to prevent issues
+  update-interval: 100
+  header: |-
+    <dark_gray><strikethrough> ]                                                                  [ <reset>
+    <gray>
+    <gradient:#FF5CCC:#743296>mc.niso.moe
+    <gray>
+  footer: |-
+    <gray>
+    <gray>TPS: <green>%server_tps_15% <dark_gray>| <gray>Your Ping: <green>%player_ping%ms
+    <gray>Players: <green>%server_online% <dark_gray>| <gray>Uptime: <green>%server_uptime%
+    <gray>
+    <dark_gray><strikethrough> ]                                                                  [ <reset>
 
 # This prefix is used in all messages sent by the plugin.
 message-prefix: <dark_gray>[<gradient:#FF5CCC:#743296>Niso<dark_gray>] <reset>

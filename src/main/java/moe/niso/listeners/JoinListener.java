@@ -2,6 +2,7 @@ package moe.niso.listeners;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import moe.niso.NisoPlugin;
+import moe.niso.managers.TablistManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
@@ -16,6 +17,8 @@ public class JoinListener implements Listener {
 
         String welcomeText = PlaceholderAPI.setPlaceholders(player, NisoPlugin.getInstance().getWelcomeMessage());
         final Component welcomeMessage = MiniMessage.miniMessage().deserialize(welcomeText);
+
+        TablistManager.updateTablist(player);
 
         event.joinMessage(welcomeMessage);
     }
