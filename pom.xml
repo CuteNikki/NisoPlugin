@@ -17,6 +17,7 @@
     </properties>
 
     <build>
+        <finalName>NisoPlugin</finalName>
         <defaultGoal>clean package</defaultGoal>
         <plugins>
             <plugin>
