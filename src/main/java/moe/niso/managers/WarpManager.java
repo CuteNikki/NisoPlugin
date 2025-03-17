@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WarpManager {
-    private final NisoPlugin plugin = NisoPlugin.getInstance();
+    private final static NisoPlugin plugin = NisoPlugin.getInstance();
 
     /**
      * Sets a warp in the database.
@@ -22,7 +22,7 @@ public class WarpManager {
      * @param warpName The name of the warp
      * @return True if the warp was set successfully, false otherwise
      */
-    public boolean setWarp(Player player, String warpName) {
+    public static boolean setWarp(Player player, String warpName) {
         Location location = player.getLocation();
         String worldName = location.getWorld().getName();
         double x = location.getX();
@@ -59,7 +59,7 @@ public class WarpManager {
      * @param warpName The name of the warp
      * @return The warp location, or null if the warp was not found
      */
-    public Location getWarp(String warpName) {
+    public static Location getWarp(String warpName) {
         // SQL query to retrieve the warp location
         String sql = "SELECT world, x, y, z, pitch, yaw FROM warps WHERE warp_name = ?;";
 
@@ -84,7 +84,7 @@ public class WarpManager {
      * @param warpName The name of the warp to delete
      * @return True if the warp was deleted successfully, false otherwise
      */
-    public boolean deleteWarp(String warpName) {
+    public static boolean deleteWarp(String warpName) {
         // SQL query to delete the warp
         String sql = "DELETE FROM warps WHERE warp_name = ?;";
 
@@ -103,7 +103,7 @@ public class WarpManager {
      *
      * @return A set of warp names
      */
-    public List<String> getWarpNames() {
+    public static List<String> getWarpNames() {
         // SQL query to retrieve all warp names
         String sql = "SELECT warp_name FROM warps;";
 
@@ -129,7 +129,7 @@ public class WarpManager {
      * @param warpName The warp name to check
      * @return True if the warp name is valid, false otherwise
      */
-    public boolean isValidWarpName(String warpName) {
+    public static boolean isValidWarpName(String warpName) {
         if (warpName == null || warpName.isEmpty()) {
             return false;
         }

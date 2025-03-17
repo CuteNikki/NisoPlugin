@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HomeManager {
-    private final NisoPlugin plugin = NisoPlugin.getInstance();
+    private final static NisoPlugin plugin = NisoPlugin.getInstance();
 
     /**
      * Sets a home for a player in the database.
@@ -24,7 +24,7 @@ public class HomeManager {
      * @param homeName The name of the home
      * @return True if the home was set successfully, false otherwise
      */
-    public boolean setHome(Player player, String homeName) {
+    public static boolean setHome(Player player, String homeName) {
         Location location = player.getLocation();
         String worldName = location.getWorld().getName();
         double x = location.getX();
@@ -48,9 +48,14 @@ public class HomeManager {
             ps.setFloat(8, yaw);
 
             ps.executeUpdate();
+
+            if (plugin.isDebugMode()) {
+                plugin.getLogger().info("Home set by player " + player.getName() + " (" + player.getUniqueId() + ") at world: " + worldName + " x: " + x + " y: " + y + " z:" + z + " pitch: " + pitch + " yaw: " + yaw);
+            }
+
             return true;
         } catch (SQLException e) {
-            plugin.getLogger().warning("Error setting home for player: " + e.getMessage());
+            plugin.getLogger().warning("Error setting home for player " + player.getName() + " (" + player.getUniqueId() + "): at world: " + worldName + " x: " + x + " y: " + y + " z:" + z + " pitch: " + pitch + " yaw: " + yaw + " error: " + e.getMessage());
             return false;
         }
     }
@@ -62,7 +67,7 @@ public class HomeManager {
      * @param homeName The name of the home to retrieve
      * @return The home location, or null if not found
      */
-    public Location getHome(Player player, String homeName) {
+    public static Location getHome(Player player, String homeName) {
         // SQL query to retrieve the home location
         String sql = "SELECT world, x, y, z, pitch, yaw FROM homes WHERE creator_uuid = ? AND home_name = ?";
 
@@ -99,7 +104,7 @@ public class HomeManager {
      * @param homeName The name of the home to delete
      * @return True if the home was deleted, false otherwise
      */
-    public boolean deleteHome(Player player, String homeName) {
+    public static boolean deleteHome(Player player, String homeName) {
         String sql = "DELETE FROM homes WHERE creator_uuid = ? AND home_name = ?";
 
         try (Connection connection = plugin.getDatabaseManager().getDataSource().getConnection(); PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -108,7 +113,12 @@ public class HomeManager {
             ps.setString(2, homeName);
 
             int rowsAffected = ps.executeUpdate();
-            return rowsAffected > 0;
+
+            if (plugin.isDebugMode()) {
+                plugin.getLogger().info("Home deleted by player " + player.getName() + " (" + player.getUniqueId() + ") with name: " + homeName);
+            }
+
+            return rowsAffected > 0; // True if rows were deleted
 
         } catch (SQLException e) {
             plugin.getLogger().warning("Error deleting home from database: " + e.getMessage());
@@ -122,7 +132,7 @@ public class HomeManager {
      * @param player The player to get homes for
      * @return A list of home names
      */
-    public List<String> getHomeNames(Player player) {
+    public static List<String> getHomeNames(Player player) {
         String sql = "SELECT home_name FROM homes WHERE creator_uuid = ?";
         List<String> homes = new ArrayList<>();
 
@@ -134,6 +144,10 @@ public class HomeManager {
                 while (rs.next()) {
                     homes.add(rs.getString("home_name"));
                 }
+            }
+
+            if (plugin.isDebugMode()) {
+                plugin.getLogger().info("Retrieved " + homes.size() + " homes for player " + player.getName() + " (" + player.getUniqueId() + "): " + homes);
             }
         } catch (SQLException e) {
             plugin.getLogger().warning("Error getting homes from database for player " + player.getName() + ": " + e.getMessage());
@@ -149,15 +163,29 @@ public class HomeManager {
      * @param homeName The name of the home to check
      * @return True if the home name is valid, false otherwise
      */
-    public boolean isValidHomeName(String homeName) {
+    public static boolean isValidHomeName(String homeName) {
         if (homeName == null || homeName.isEmpty()) {
+            if (plugin.isDebugMode()) {
+                plugin.getLogger().info("Home name is empty or null");
+            }
             return false;
         }
+
         if (homeName.length() > 20) {
+            if (plugin.isDebugMode()) {
+                plugin.getLogger().info("Home name is too long");
+            }
             return false;
         }
-        // Disallow special characters or other restrictions
-        return homeName.matches("^[a-zA-Z0-9_]+$");
+
+        if (!homeName.matches("^[a-zA-Z0-9_]+$")) {
+            if (plugin.isDebugMode()) {
+                plugin.getLogger().info("Home name contains invalid characters");
+            }
+            return false;
+        }
+
+        return true;
     }
 
 }

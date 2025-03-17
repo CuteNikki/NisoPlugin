@@ -1,5 +1,7 @@
 # Automatically download the latest release
 auto-update: true
+# Debug logs
+debug: false
 
 # We use PlaceholderAPI placeholders and MiniMessage formatting in this configuration file.
 

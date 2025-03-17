@@ -16,7 +16,6 @@ import java.util.List;
 
 public class HomeCommand implements TabExecutor {
     private final NisoPlugin plugin = NisoPlugin.getInstance();
-    private final HomeManager manager = new HomeManager();
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
@@ -48,19 +47,17 @@ public class HomeCommand implements TabExecutor {
 
             final String homeName = args[1].toLowerCase();
 
-            if (!manager.isValidHomeName(homeName)) {
+            if (!HomeManager.isValidHomeName(homeName)) {
                 player.sendMessage(plugin.prefixMessage(Component.text("Invalid home name! It must be alphanumeric and under 20 characters.").color(NamedTextColor.RED)));
                 return true;
             }
 
-            final boolean isSet = manager.setHome(player, homeName);
+            final boolean isSet = HomeManager.setHome(player, homeName);
 
             if (!isSet) {
                 player.sendMessage(plugin.prefixMessage(Component.text("An error occurred while setting your home. Please try again later.").color(NamedTextColor.RED)));
                 return true;
             }
-
-            plugin.getLogger().info(player.getName() + " set a home called '" + homeName + "'");
 
             player.sendMessage(plugin.prefixMessage(Component.text("Home ").color(NamedTextColor.GREEN).append(Component.text(homeName).color(NamedTextColor.YELLOW)).append(Component.text(" set!").color(NamedTextColor.GREEN))));
             return true;
@@ -73,21 +70,19 @@ public class HomeCommand implements TabExecutor {
             }
 
             final String homeName = args[1].toLowerCase();
-            final Location homeLocation = manager.getHome(player, homeName);
+            final Location homeLocation = HomeManager.getHome(player, homeName);
 
             if (homeLocation == null) {
                 player.sendMessage(plugin.prefixMessage(Component.text("Home ").color(NamedTextColor.RED).append(Component.text(homeName).color(NamedTextColor.YELLOW)).append(Component.text(" does not exist!").color(NamedTextColor.RED))));
                 return true;
             }
 
-            final boolean isDeleted = manager.deleteHome(player, homeName);
+            final boolean isDeleted = HomeManager.deleteHome(player, homeName);
 
             if (!isDeleted) {
                 player.sendMessage(plugin.prefixMessage(Component.text("An error occurred while deleting your home. Please try again later.").color(NamedTextColor.RED)));
                 return true;
             }
-
-            plugin.getLogger().info(player.getName() + " deleted a home called '" + homeName + "'");
 
             player.sendMessage(plugin.prefixMessage(Component.text("Home ").color(NamedTextColor.GREEN).append(Component.text(args[1].toLowerCase()).color(NamedTextColor.YELLOW)).append(Component.text(" deleted!").color(NamedTextColor.GREEN))));
             return true;
@@ -101,7 +96,7 @@ public class HomeCommand implements TabExecutor {
             }
 
             final String homeName = args[1].toLowerCase();
-            final Location homeLocation = manager.getHome(player, homeName);
+            final Location homeLocation = HomeManager.getHome(player, homeName);
 
             if (homeLocation == null) {
                 player.sendMessage(plugin.prefixMessage(Component.text("Home ").color(NamedTextColor.RED).append(Component.text(homeName).color(NamedTextColor.YELLOW)).append(Component.text(" does not exist!").color(NamedTextColor.RED))));
@@ -110,13 +105,9 @@ public class HomeCommand implements TabExecutor {
 
             try {
                 player.teleport(homeLocation);
-
-                plugin.getLogger().info(player.getName() + " teleported to home '" + homeName + "'");
-
                 player.sendMessage(plugin.prefixMessage(Component.text("Teleported to home ").color(NamedTextColor.GREEN).append(Component.text(homeName).color(NamedTextColor.YELLOW)).append(Component.text("!").color(NamedTextColor.GREEN))));
             } catch (Exception e) {
                 plugin.getLogger().warning("Failed to teleport " + player.getName() + " to home '" + homeName + "'");
-
                 player.sendMessage(plugin.prefixMessage(Component.text("Failed to teleport to home ").color(NamedTextColor.RED).append(Component.text(homeName).color(NamedTextColor.YELLOW)).append(Component.text("!").color(NamedTextColor.RED))));
             }
 
@@ -130,14 +121,12 @@ public class HomeCommand implements TabExecutor {
                 return true;
             }
 
-            final List<String> homeNames = manager.getHomeNames(player);
+            final List<String> homeNames = HomeManager.getHomeNames(player);
 
             if (homeNames.isEmpty()) {
                 player.sendMessage(plugin.prefixMessage(Component.text("You have no homes set!").color(NamedTextColor.RED)));
                 return true;
             }
-
-            plugin.getLogger().info(player.getName() + " listed their homes: " + String.join(", ", homeNames));
 
             player.sendMessage(plugin.prefixMessage(Component.text("Your homes: ").color(NamedTextColor.GREEN).append(Component.text(String.join(", ", homeNames)).color(NamedTextColor.YELLOW))));
             return true;
@@ -159,7 +148,7 @@ public class HomeCommand implements TabExecutor {
                 return List.of();
             }
 
-            return manager.getHomeNames(player);
+            return HomeManager.getHomeNames(player);
         }
 
         return List.of();

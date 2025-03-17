@@ -16,7 +16,6 @@ import java.util.List;
 
 public class WarpCommand implements TabExecutor {
     private final NisoPlugin plugin = NisoPlugin.getInstance();
-    private final WarpManager manager = new WarpManager();
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
@@ -48,19 +47,17 @@ public class WarpCommand implements TabExecutor {
 
             final String warpName = args[1].toLowerCase();
 
-            if (!manager.isValidWarpName(warpName)) {
+            if (!WarpManager.isValidWarpName(warpName)) {
                 player.sendMessage(plugin.prefixMessage(Component.text("Invalid warp name! It must be alphanumeric and under 20 characters.").color(NamedTextColor.RED)));
                 return true;
             }
 
-            final boolean isSet = manager.setWarp(player, warpName);
+            final boolean isSet = WarpManager.setWarp(player, warpName);
 
             if (!isSet) {
                 player.sendMessage(plugin.prefixMessage(Component.text("An error occurred while setting your warp. Please try again later.").color(NamedTextColor.RED)));
                 return true;
             }
-
-            plugin.getLogger().info(player.getName() + " set a warp called '" + warpName + "'");
 
             player.sendMessage(plugin.prefixMessage(Component.text("Warp ").color(NamedTextColor.GREEN).append(Component.text(warpName).color(NamedTextColor.YELLOW)).append(Component.text(" has been set!").color(NamedTextColor.GREEN))));
             return true;
@@ -73,21 +70,19 @@ public class WarpCommand implements TabExecutor {
             }
 
             final String warpName = args[1].toLowerCase();
-            final Location warpLocation = manager.getWarp(warpName);
+            final Location warpLocation = WarpManager.getWarp(warpName);
 
             if (warpLocation == null) {
                 player.sendMessage(plugin.prefixMessage(Component.text("Warp ").color(NamedTextColor.RED).append(Component.text(warpName).color(NamedTextColor.YELLOW)).append(Component.text(" does not exist!").color(NamedTextColor.RED))));
                 return true;
             }
 
-            final boolean isDeleted = manager.deleteWarp(warpName);
+            final boolean isDeleted = WarpManager.deleteWarp(warpName);
 
             if (!isDeleted) {
                 player.sendMessage(plugin.prefixMessage(Component.text("An error occurred while deleting the warp. Please try again later.").color(NamedTextColor.RED)));
                 return true;
             }
-
-            plugin.getLogger().info(player.getName() + " deleted a warp called '" + warpName + "'");
 
             player.sendMessage(plugin.prefixMessage(Component.text("Warp ").color(NamedTextColor.GREEN).append(Component.text(warpName).color(NamedTextColor.YELLOW)).append(Component.text(" has been deleted!").color(NamedTextColor.GREEN))));
             return true;
@@ -101,7 +96,7 @@ public class WarpCommand implements TabExecutor {
             }
 
             final String warpName = args[1].toLowerCase();
-            final Location warpLocation = manager.getWarp(warpName);
+            final Location warpLocation = WarpManager.getWarp(warpName);
 
             if (warpLocation == null) {
                 player.sendMessage(plugin.prefixMessage(Component.text("Warp ").color(NamedTextColor.RED).append(Component.text(warpName).color(NamedTextColor.YELLOW)).append(Component.text(" does not exist or is invalid!").color(NamedTextColor.RED))));
@@ -110,13 +105,9 @@ public class WarpCommand implements TabExecutor {
 
             try {
                 player.teleport(warpLocation);
-
-                plugin.getLogger().info(player.getName() + " teleported to warp '" + warpName + "'");
-
                 player.sendMessage(plugin.prefixMessage(Component.text("You have been teleported to warp ").color(NamedTextColor.GREEN).append(Component.text(warpName).color(NamedTextColor.YELLOW)).append(Component.text("!").color(NamedTextColor.GREEN))));
             } catch (Exception e) {
                 plugin.getLogger().warning("Failed to teleport " + player.getName() + " to warp '" + warpName + "'");
-
                 player.sendMessage(plugin.prefixMessage(Component.text("Failed to teleport to warp ").color(NamedTextColor.RED).append(Component.text(warpName).color(NamedTextColor.YELLOW)).append(Component.text("!").color(NamedTextColor.RED))));
             }
             return true;
@@ -129,14 +120,12 @@ public class WarpCommand implements TabExecutor {
                 return true;
             }
 
-            final List<String> warpNames = manager.getWarpNames();
+            final List<String> warpNames = WarpManager.getWarpNames();
 
             if (warpNames.isEmpty()) {
                 player.sendMessage(plugin.prefixMessage(Component.text("There are no warps!").color(NamedTextColor.RED)));
                 return true;
             }
-
-            plugin.getLogger().info(player.getName() + " listed all warps");
 
             player.sendMessage(plugin.prefixMessage(Component.text("Warps: ").color(NamedTextColor.GREEN).append(Component.text(String.join(", ", warpNames)).color(NamedTextColor.YELLOW))));
             return true;
@@ -153,7 +142,7 @@ public class WarpCommand implements TabExecutor {
         }
 
         if (args.length == 2 && List.of("teleport", "tp", "delete", "set").contains(args[0].toLowerCase())) {
-            return manager.getWarpNames();
+            return WarpManager.getWarpNames();
         }
 
         return List.of();
