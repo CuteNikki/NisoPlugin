@@ -16,6 +16,18 @@ import java.util.List;
 public class HomeManager {
     private final static NisoPlugin plugin = NisoPlugin.getInstance();
 
+    public static int getHomeLimit(Player player) {
+        int maxHomes = 1; // Default limit
+
+        for (int index = 2; index <= 50; index++) {
+            if (player.hasPermission("niso.home.limit-" + index)) {
+                maxHomes = index;
+            }
+        }
+
+        return maxHomes;
+    }
+
     /**
      * Sets a home for a player in the database.
      * If the home already exists, it will be updated.

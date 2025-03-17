@@ -206,6 +206,7 @@ Autocomplete:
 - **niso.home.delete**: Allows players to remove home locations.
 - **niso.home.teleport**: Allows players to teleport to home locations.
 - **niso.home.list**: Allows players to list home locations.
+- **niso.home.limit-(number)**: Allows players to set a specific number (up to 50) of home locations (`niso.home.limit-3` for a max of 3 homes).
 
 ## Support
 

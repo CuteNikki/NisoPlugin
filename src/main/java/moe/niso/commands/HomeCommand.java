@@ -52,6 +52,11 @@ public class HomeCommand implements TabExecutor {
                 return true;
             }
 
+            if (HomeManager.getHomeNames(player).size() >= HomeManager.getHomeLimit(player)) {
+                player.sendMessage(plugin.prefixMessage(Component.text("You have reached the maximum number of homes!").color(NamedTextColor.RED)));
+                return true;
+            }
+
             final boolean isSet = HomeManager.setHome(player, homeName);
 
             if (!isSet) {
