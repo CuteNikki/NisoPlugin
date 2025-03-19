@@ -47,7 +47,7 @@ formatting.
 
 1. Download the latest release of NisoPlugin.
 2. Place the `NisoPlugin.jar` file in your server's `plugins` directory.
-3. Configure the `config.yml` file to set up your PostgreSQL database connection and customize messages.
+3. Configure the `plugins/NisoPlugin/config.yml` file to set up your PostgreSQL database connection and customize messages.
 4. Restart your server to load the plugin.
 
 ## Configuration
