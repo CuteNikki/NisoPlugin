@@ -37,10 +37,6 @@ public class TablistManager {
         }.runTaskTimerAsynchronously(plugin, 0, updateInterval);
     }
 
-    public void stop() {
-        task.cancel();
-    }
-
     public static void updateTablist(Player player) {
         final ConfigurationSection tablistConfig = plugin.getConfig().getConfigurationSection("tablist");
 
@@ -67,6 +63,12 @@ public class TablistManager {
 
                 onlinePlayer.sendPlayerListHeaderAndFooter(headerComponent, footerComponent);
             }
+        }
+    }
+
+    public void stop() {
+        if (task != null) {
+            task.cancel();
         }
     }
 }
