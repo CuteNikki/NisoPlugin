@@ -1,6 +1,7 @@
 package moe.niso.listeners;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
+import me.clip.placeholderapi.PlaceholderAPI;
 import moe.niso.NisoPlugin;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.configuration.ConfigurationSection;
@@ -24,6 +25,11 @@ public class ChatListener implements Listener {
             return;
         }
 
-        event.renderer((source, sourceDisplayName, message, viewer) -> MiniMessage.miniMessage().deserialize(format).replaceText(builder -> builder.matchLiteral("%player_name%").replacement(sourceDisplayName)).replaceText(builder -> builder.matchLiteral("%message%").replacement(message)));
+        final String finalFormat = PlaceholderAPI.setPlaceholders(event.getPlayer(), format);
+
+        event.renderer((source, sourceDisplayName, message, viewer) -> MiniMessage.miniMessage()
+                .deserialize(finalFormat)
+                .replaceText(builder -> builder.matchLiteral("%player_name%").replacement(sourceDisplayName))
+                .replaceText(builder -> builder.matchLiteral("%message%").replacement(message)));
     }
 }

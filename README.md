@@ -80,6 +80,7 @@ message-prefix: <dark_gray>[<gradient:#FF5CCC:#743296>Niso<dark_gray>] <reset>
 # Recommended placeholders to download:
 # /papi ecloud download Server
 # /papi ecloud download Player
+# /papi ecloud download LuckPerms
 
 # Tablist configuration
 tablist:
@@ -123,7 +124,9 @@ leave-message:
 chat-format:
   enabled: false
   # Example message: Nikki » Hello, world!
-  format: <gray>%player_name% <dark_gray>» <reset>%message%
+  # format: <gray>%player_name% <dark_gray>» <reset>%message%
+  # Example message with LuckPerms Prefix: Admin | Nikki » Hello, world!
+  format: "%luckperms_prefix% %player_name% <dark_gray>» <reset>%message%"
 
 # Server MOTD Configuration
 server-motd:
