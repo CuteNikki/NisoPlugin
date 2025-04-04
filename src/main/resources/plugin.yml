@@ -12,9 +12,9 @@ commands:
     description: Teleport to any configured place
     usage: /warp <set/delete/list/teleport> [name]
     aliases: [ w ]
-    permission: niso.warp
+    permission: niso.warp.use
   home:
     description: Teleport to your homes
     usage: /home <set/delete/list/teleport> [name]
     aliases: [ h ]
-    permission: niso.home
+    permission: niso.home.use
