@@ -6,7 +6,7 @@
 
     <groupId>moe.niso</groupId>
     <artifactId>niso</artifactId>
-    <version>1.2.3</version>
+    <version>1.2.4</version>
     <packaging>jar</packaging>
 
     <name>niso</name>
@@ -92,6 +92,12 @@
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20250107</version>
+        </dependency>
+        <dependency>
+            <groupId>net.luckperms</groupId>
+            <artifactId>api</artifactId>
+            <version>5.4</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

@@ -65,6 +65,7 @@ public class JoinListener implements Listener {
         final ConfigurationSection tablistConfig = plugin.getConfig().getConfigurationSection("tablist");
         if (tablistConfig != null && tablistConfig.getBoolean("enabled")) {
             TablistManager.updateTablist(player);
+            TablistManager.setAllPlayerNames();
         }
     }
 }
