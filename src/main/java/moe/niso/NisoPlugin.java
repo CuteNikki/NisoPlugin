@@ -2,16 +2,14 @@ package moe.niso;
 
 import moe.niso.commands.HomeCommand;
 import moe.niso.commands.WarpCommand;
-import moe.niso.listeners.ChatListener;
-import moe.niso.listeners.JoinListener;
-import moe.niso.listeners.LeaveListener;
-import moe.niso.listeners.MotdListener;
+import moe.niso.listeners.*;
 import moe.niso.managers.ConfigManager;
 import moe.niso.managers.DatabaseManager;
 import moe.niso.managers.TablistManager;
 import moe.niso.managers.VersionManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.PluginManager;
@@ -26,6 +24,7 @@ public final class NisoPlugin extends JavaPlugin {
     public String logPrefixUpdater = "Updater -> ";
     private DatabaseManager databaseManager;
     private TablistManager tablistManager;
+    private LuckPerms luckPerms;
 
     /**
      * Get the plugin instance.
@@ -58,6 +57,7 @@ public final class NisoPlugin extends JavaPlugin {
         // Without these the plugin will not work properly
         initialiseDatabase();
         initialisePlaceholderAPI();
+        initialiseLuckPerms();
 
         // Checking for a new version
         updateCheck();
@@ -111,7 +111,6 @@ public final class NisoPlugin extends JavaPlugin {
         manager.registerEvents(new LeaveListener(), this);
         manager.registerEvents(new ChatListener(), this);
         manager.registerEvents(new MotdListener(), this);
-
         getLogger().info(logPrefixManager + "Events registered!");
     }
 
@@ -147,6 +146,27 @@ public final class NisoPlugin extends JavaPlugin {
             getLogger().info(logPrefixManager + "PlaceholderAPI found!");
         } else {
             getLogger().severe(logPrefixManager + "PlaceholderAPI is not installed!");
+            getLogger().severe(logPrefixManager + "Disabling plugin...");
+            Bukkit.getPluginManager().disablePlugin(this);
+        }
+    }
+
+    /**
+     * Initialise LuckPerms and disable the plugin if it's not found.
+     */
+    private void initialiseLuckPerms() {
+        if (Bukkit.getPluginManager().isPluginEnabled("LuckPerms")) {
+            getLogger().info(logPrefixManager + "LuckPerms found!");
+            luckPerms = Bukkit.getServicesManager().load(LuckPerms.class);
+            if (luckPerms == null) {
+                getLogger().severe(logPrefixManager + "LuckPerms service not found!");
+                getLogger().severe(logPrefixManager + "Disabling plugin...");
+                Bukkit.getPluginManager().disablePlugin(this);
+            } else {
+                getLogger().info(logPrefixManager + "LuckPerms service loaded successfully!");
+            }
+        } else {
+            getLogger().severe(logPrefixManager + "LuckPerms is not installed!");
             getLogger().severe(logPrefixManager + "Disabling plugin...");
             Bukkit.getPluginManager().disablePlugin(this);
         }
@@ -203,6 +223,15 @@ public final class NisoPlugin extends JavaPlugin {
      */
     public DatabaseManager getDatabaseManager() {
         return databaseManager;
+    }
+
+    /**
+     * Get the LuckPerms instance.
+     *
+     * @return LuckPerms instance
+     */
+    public LuckPerms getLuckPerms() {
+        return luckPerms;
     }
 
     /**
