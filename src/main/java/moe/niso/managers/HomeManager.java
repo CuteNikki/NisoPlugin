@@ -5,6 +5,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,10 +13,70 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 public class HomeManager {
     private final static NisoPlugin plugin = NisoPlugin.getInstance();
 
+    private final static ConcurrentHashMap<UUID, List<String>> homeCache = new ConcurrentHashMap<>();
+    private final static long CACHE_EXPIRATION_TIME = TimeUnit.MINUTES.toMillis(5); // Cache expiration time of 5 minutes
+    private final static ConcurrentHashMap<UUID, Long> cacheTimestamps = new ConcurrentHashMap<>();
+
+    /**
+     * Starts a periodic task to clean up expired cache entries.
+     * This method should be called when the plugin is enabled.
+     */
+    public static void startHomeCacheCleanup() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                cleanExpiredCache();
+            }
+        }.runTaskTimer(plugin, 0L, 1200L * 5); // Runs every 5 minutes (5 * 1200 ticks)
+    }
+
+    /**
+     * Invalidates the home cache for a player.
+     *
+     * @param uuid The UUID of the player
+     */
+    public static void invalidateHomeCache(UUID uuid) {
+        homeCache.remove(uuid);
+        cacheTimestamps.remove(uuid);
+    }
+
+    /**
+     * Updates the home cache for a player.
+     *
+     * @param uuid  The UUID of the player
+     * @param homes The list of home names
+     */
+    private static void updateHomeCache(UUID uuid, List<String> homes) {
+        homeCache.put(uuid, homes);
+        cacheTimestamps.put(uuid, System.currentTimeMillis());
+    }
+
+    /**
+     * Cleans up expired cache entries.
+     * This method should be called periodically to remove expired cache entries.
+     */
+    private static void cleanExpiredCache() {
+        long now = System.currentTimeMillis();
+        for (UUID uuid : cacheTimestamps.keySet()) {
+            if (now - cacheTimestamps.get(uuid) >= CACHE_EXPIRATION_TIME) {
+                homeCache.remove(uuid);
+                cacheTimestamps.remove(uuid);
+            }
+        }
+    }
+
+    /**
+     * Gets the maximum number of homes a player can have.
+     * @param player The player to check
+     * @return The maximum number of homes the player can have
+     */
     public static int getHomeLimit(Player player) {
         int maxHomes = 1; // Default limit
 
@@ -60,6 +121,9 @@ public class HomeManager {
             ps.setFloat(8, yaw);
 
             ps.executeUpdate();
+
+            // Invalidate the cache for this player
+            invalidateHomeCache(player.getUniqueId());
 
             if (plugin.getConfig().getBoolean("debug")) {
                 plugin.getLogger().info("Home set by player " + player.getName() + " (" + player.getUniqueId() + ") at world: " + worldName + " x: " + x + " y: " + y + " z:" + z + " pitch: " + pitch + " yaw: " + yaw);
@@ -126,6 +190,9 @@ public class HomeManager {
 
             int rowsAffected = ps.executeUpdate();
 
+            // Invalidate the cache for this player
+            invalidateHomeCache(player.getUniqueId());
+
             if (plugin.getConfig().getBoolean("debug")) {
                 plugin.getLogger().info("Home deleted by player " + player.getName() + " (" + player.getUniqueId() + ") with name: " + homeName);
             }
@@ -145,28 +212,52 @@ public class HomeManager {
      * @return A list of home names
      */
     public static List<String> getHomeNames(Player player) {
-        String sql = "SELECT home_name FROM homes WHERE creator_uuid = ?";
-        List<String> homes = new ArrayList<>();
+        return getHomeNames(player, false);  // Default behavior with forceRefresh set to false
+    }
 
-        try (Connection connection = plugin.getDatabaseManager().getDataSource().getConnection(); PreparedStatement ps = connection.prepareStatement(sql)) {
+    /**
+     * Retrieves a list of home names for a player.
+     *
+     * @param player The player to get homes for
+     * @param forceRefresh Whether to bypass the cache and refresh it
+     * @return A list of home names
+     */
+    public static List<String> getHomeNames(Player player, boolean forceRefresh) {
+        UUID uuid = player.getUniqueId();
+        long now = System.currentTimeMillis();
 
-            ps.setObject(1, player.getUniqueId());
+        // If forceRefresh is true, bypass the cache and fetch the data
+        if (forceRefresh || !homeCache.containsKey(uuid) || (now - cacheTimestamps.getOrDefault(uuid, 0L) >= CACHE_EXPIRATION_TIME)) {
+            List<String> homes = new ArrayList<>();
+            String sql = "SELECT home_name FROM homes WHERE creator_uuid = ?";
 
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    homes.add(rs.getString("home_name"));
+            try (Connection connection = plugin.getDatabaseManager().getDataSource().getConnection();
+                 PreparedStatement ps = connection.prepareStatement(sql)) {
+
+                ps.setObject(1, player.getUniqueId());
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        homes.add(rs.getString("home_name"));
+                    }
                 }
+            } catch (SQLException e) {
+                plugin.getLogger().warning("Error getting homes from database for player " + player.getName() + ": " + e.getMessage());
+                player.sendMessage(plugin.prefixMessage(Component.text("An error occurred while retrieving your homes. Please try again later.").color(NamedTextColor.RED)));
             }
-        } catch (SQLException e) {
-            plugin.getLogger().warning("Error getting homes from database for player " + player.getName() + ": " + e.getMessage());
-            player.sendMessage(plugin.prefixMessage(Component.text("An error occurred while retrieving your homes. Please try again later.").color(NamedTextColor.RED)));
-        }
 
-        if (plugin.getConfig().getBoolean("debug")) {
-            plugin.getLogger().info("Retrieved " + homes.size() + " homes for player " + player.getName() + " (" + player.getUniqueId() + "): " + homes);
-        }
+            if (plugin.getConfig().getBoolean("debug")) {
+                plugin.getLogger().info("Retrieved " + homes.size() + " homes for player " + player.getName() + " (" + player.getUniqueId() + "): " + homes);
+            }
 
-        return homes;
+            // Store the homes in the cache
+            updateHomeCache(player.getUniqueId(), homes);
+
+            return homes;
+        } else {
+            // Return cached homes if available
+            return homeCache.get(uuid);
+        }
     }
 
     /**

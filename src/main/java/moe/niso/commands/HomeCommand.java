@@ -126,7 +126,7 @@ public class HomeCommand implements TabExecutor {
                 return true;
             }
 
-            final List<String> homeNames = HomeManager.getHomeNames(player);
+            final List<String> homeNames = HomeManager.getHomeNames(player, true);
 
             if (homeNames.isEmpty()) {
                 player.sendMessage(plugin.prefixMessage(Component.text("You have no homes set!").color(NamedTextColor.RED)));
