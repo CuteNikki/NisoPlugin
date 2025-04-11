@@ -68,6 +68,7 @@ public final class NisoPlugin extends JavaPlugin {
 
         // Start cache cleanup
         HomeManager.startHomeCacheCleanup();
+        WarpManager.startWarpCacheCleanup();
 
         // Notify that the plugin is enabled
         getLogger().info(logPrefixManager + "Plugin is enabled!");

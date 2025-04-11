@@ -3,6 +3,7 @@ package moe.niso.managers;
 import moe.niso.NisoPlugin;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,9 +11,53 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class WarpManager {
     private final static NisoPlugin plugin = NisoPlugin.getInstance();
+
+    private static List<String> warpNamesCache = null;
+    private static long cacheTimestamp = 0;
+    private static final long CACHE_EXPIRATION_TIME = TimeUnit.MINUTES.toMillis(5); // 5 minutes
+
+    /**
+     * Cleans up expired warp cache entries.
+     * This method is called periodically to ensure that the cache does not grow indefinitely.
+     */
+    public static void startWarpCacheCleanup() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                cleanExpiredWarpCache();
+            }
+        }.runTaskTimer(plugin, 0L, 1200L * 5); // Run every 5 minutes
+    }
+
+    /**
+     * Cleans up expired warp cache entries.
+     * This method is called periodically to ensure that the cache does not grow indefinitely.
+     */
+    private static void cleanExpiredWarpCache() {
+        long currentTime = System.currentTimeMillis();
+        if (warpNamesCache != null && (currentTime - cacheTimestamp) > CACHE_EXPIRATION_TIME) {
+            invalidateWarpCache();
+        }
+    }
+
+    /**
+     * Invalidates the warp cache.
+     * This method should be called when the warp data is modified to ensure that the cache is up-to-date.
+     */
+    public static void invalidateWarpCache() {
+        warpNamesCache = null; // Invalidate the cache
+        cacheTimestamp = 0;
+    }
+
+    public static void updateWarpCache(List<String> homes) {
+        long currentTime = System.currentTimeMillis();
+        warpNamesCache = homes;
+        cacheTimestamp = currentTime;
+    }
 
     /**
      * Sets a warp in the database.
@@ -46,6 +91,8 @@ public class WarpManager {
             ps.setFloat(8, yaw);
 
             ps.executeUpdate();
+
+            invalidateWarpCache();
 
             if (plugin.getConfig().getBoolean("debug")) {
                 plugin.getLogger().info("Warp set by player " + player.getName() + " (" + player.getUniqueId() + ") at world: " + worldName + " x: " + x + " y: " + y + " z:" + z + " pitch: " + pitch + " yaw: " + yaw);
@@ -97,6 +144,8 @@ public class WarpManager {
             ps.setString(1, warpName);
             ps.executeUpdate();
 
+            invalidateWarpCache();
+
             if (plugin.getConfig().getBoolean("debug")) {
                 plugin.getLogger().info("Warp deleted: " + warpName);
             }
@@ -109,11 +158,27 @@ public class WarpManager {
     }
 
     /**
-     * Retrieves a list of all warp names from the database.
+     * Retrieves a list of all warp names from the cache or database.
      *
      * @return A set of warp names
      */
     public static List<String> getWarpNames() {
+        return getWarpNames(false);
+    }
+
+    /**
+     * Retrieves a list of all warp names from the cache or database.
+     *
+     * @return A set of warp names
+     */
+    public static List<String> getWarpNames(boolean forceRefresh) {
+        long currentTime = System.currentTimeMillis();
+
+        // If the cache is still valid, return the cached warp names
+        if (!forceRefresh && warpNamesCache != null && (currentTime - cacheTimestamp) < CACHE_EXPIRATION_TIME) {
+            return warpNamesCache;
+        }
+
         // SQL query to retrieve all warp names
         String sql = "SELECT warp_name FROM warps;";
         List<String> warpNames = new ArrayList<>();
@@ -130,6 +195,8 @@ public class WarpManager {
         if (plugin.getConfig().getBoolean("debug")) {
             plugin.getLogger().info("Retrieved " + warpNames.size() + " warp names: " + warpNames);
         }
+
+        updateWarpCache(warpNames);
 
         return warpNames;
     }
