@@ -64,6 +64,7 @@ public class HomeManager {
      */
     private static void cleanExpiredCache() {
         long now = System.currentTimeMillis();
+
         for (UUID uuid : cacheTimestamps.keySet()) {
             if (now - cacheTimestamps.get(uuid) >= CACHE_EXPIRATION_TIME) {
                 homeCache.remove(uuid);
@@ -74,6 +75,7 @@ public class HomeManager {
 
     /**
      * Gets the maximum number of homes a player can have.
+     *
      * @param player The player to check
      * @return The maximum number of homes the player can have
      */
@@ -109,29 +111,35 @@ public class HomeManager {
         // SQL query to insert the home if it doesn't exist already
         String sql = "INSERT INTO homes (creator_uuid, home_name, world, x, y, z, pitch, yaw, created_at) " + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP) " + "ON CONFLICT (creator_uuid, home_name) DO UPDATE SET " + "world = excluded.world, x = excluded.x, y = excluded.y, z = excluded.z, " + "pitch = excluded.pitch, yaw = excluded.yaw, created_at = excluded.created_at;";
 
-        try (Connection connection = plugin.getDatabaseManager().getDataSource().getConnection(); PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (Connection connection = plugin.getDatabaseManager().getDataSource().getConnection()) {
+            connection.setAutoCommit(false); // Start transaction
 
-            ps.setObject(1, player.getUniqueId());
-            ps.setString(2, homeName);
-            ps.setString(3, worldName);
-            ps.setDouble(4, x);
-            ps.setDouble(5, y);
-            ps.setDouble(6, z);
-            ps.setFloat(7, pitch);
-            ps.setFloat(8, yaw);
+            try (PreparedStatement ps = connection.prepareStatement(sql)) {
+                ps.setObject(1, player.getUniqueId());
+                ps.setString(2, homeName);
+                ps.setString(3, worldName);
+                ps.setDouble(4, x);
+                ps.setDouble(5, y);
+                ps.setDouble(6, z);
+                ps.setFloat(7, pitch);
+                ps.setFloat(8, yaw);
 
-            ps.executeUpdate();
+                ps.executeUpdate();
+                connection.commit(); // Commit the transaction if all goes well
 
-            // Invalidate the cache for this player
-            invalidateHomeCache(player.getUniqueId());
+                invalidateHomeCache(player.getUniqueId()); // Invalidate the cache after setting the home
 
-            if (plugin.getConfig().getBoolean("debug")) {
-                plugin.getLogger().info("Home set by player " + player.getName() + " (" + player.getUniqueId() + ") at world: " + worldName + " x: " + x + " y: " + y + " z:" + z + " pitch: " + pitch + " yaw: " + yaw);
+                if (plugin.getConfig().getBoolean("debug")) {
+                    plugin.getLogger().info("Home set by player " + player.getName() + " (" + player.getUniqueId() + ") at world: " + worldName + " x: " + x + " y: " + y + " z:" + z + " pitch: " + pitch + " yaw: " + yaw);
+                }
+                return true;
+            } catch (SQLException e) {
+                connection.rollback(); // Rollback the transaction in case of an error
+                plugin.getLogger().warning("Error setting home for player " + player.getName() + ": " + e.getMessage() + " [SQLState: " + e.getSQLState() + ", ErrorCode: " + e.getErrorCode() + "]");
+                return false;
             }
-
-            return true;
         } catch (SQLException e) {
-            plugin.getLogger().warning("Error setting home for player " + player.getName() + " (" + player.getUniqueId() + "): at world: " + worldName + " x: " + x + " y: " + y + " z:" + z + " pitch: " + pitch + " yaw: " + yaw + " error: " + e.getMessage());
+            plugin.getLogger().warning("Error setting home for player " + player.getName() + " (" + player.getUniqueId() + "): at world: " + worldName + " x: " + x + " y: " + y + " z:" + z + " pitch: " + pitch + " yaw: " + yaw + " error: " + e.getMessage() + " [SQLState: " + e.getSQLState() + ", ErrorCode: " + e.getErrorCode() + "]");
             return false;
         }
     }
@@ -183,24 +191,31 @@ public class HomeManager {
     public static boolean deleteHome(Player player, String homeName) {
         String sql = "DELETE FROM homes WHERE creator_uuid = ? AND home_name = ?";
 
-        try (Connection connection = plugin.getDatabaseManager().getDataSource().getConnection(); PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (Connection connection = plugin.getDatabaseManager().getDataSource().getConnection()) {
+            connection.setAutoCommit(false); // Start transaction
 
-            ps.setObject(1, player.getUniqueId());
-            ps.setString(2, homeName);
+            try (PreparedStatement ps = connection.prepareStatement(sql)) {
+                ps.setObject(1, player.getUniqueId());
+                ps.setString(2, homeName);
 
-            int rowsAffected = ps.executeUpdate();
+                int rowsAffected = ps.executeUpdate();
+                connection.commit(); // Commit the transaction if all goes well
 
-            // Invalidate the cache for this player
-            invalidateHomeCache(player.getUniqueId());
+                // Invalidate the cache for this player
+                invalidateHomeCache(player.getUniqueId());
 
-            if (plugin.getConfig().getBoolean("debug")) {
-                plugin.getLogger().info("Home deleted by player " + player.getName() + " (" + player.getUniqueId() + ") with name: " + homeName);
+                if (plugin.getConfig().getBoolean("debug")) {
+                    plugin.getLogger().info("Home deleted by player " + player.getName() + " (" + player.getUniqueId() + ") with name: " + homeName);
+                }
+
+                return rowsAffected > 0; // True if rows were deleted
+            } catch (SQLException e) {
+                connection.rollback(); // Rollback the transaction in case of an error
+                plugin.getLogger().warning("Error deleting home for player " + player.getName() + ": " + e.getMessage() + " [SQLState: " + e.getSQLState() + ", ErrorCode: " + e.getErrorCode() + "]");
+                return false;
             }
-
-            return rowsAffected > 0; // True if rows were deleted
-
         } catch (SQLException e) {
-            plugin.getLogger().warning("Error deleting home from database: " + e.getMessage());
+            plugin.getLogger().warning("Error deleting home from database: " + e.getMessage() + " [SQLState: " + e.getSQLState() + ", ErrorCode: " + e.getErrorCode() + "]");
             return false;
         }
     }
@@ -218,7 +233,7 @@ public class HomeManager {
     /**
      * Retrieves a list of home names for a player.
      *
-     * @param player The player to get homes for
+     * @param player       The player to get homes for
      * @param forceRefresh Whether to bypass the cache and refresh it
      * @return A list of home names
      */
@@ -255,8 +270,14 @@ public class HomeManager {
 
             return homes;
         } else {
+            List<String> cachedHomes = homeCache.get(uuid);
+
+            if (plugin.getConfig().getBoolean("debug")) {
+                plugin.getLogger().info("Returning " + cachedHomes.size() + " cached homes for player " + player.getName() + " (" + player.getUniqueId() + "): " + cachedHomes);
+            }
+
             // Return cached homes if available
-            return homeCache.get(uuid);
+            return cachedHomes;
         }
     }
 
