@@ -79,28 +79,36 @@ public class WarpManager {
         // SQL query to insert the warp if it doesn't exist already
         String sql = "INSERT INTO warps (creator_uuid, warp_name, world, x, y, z, pitch, yaw, created_at) " + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP) " + "ON CONFLICT (warp_name) DO UPDATE SET " + "world = excluded.world, x = excluded.x, y = excluded.y, z = excluded.z, " + "pitch = excluded.pitch, yaw = excluded.yaw, created_at = excluded.created_at;";
 
-        try (Connection connection = plugin.getDatabaseManager().getDataSource().getConnection(); PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (Connection connection = plugin.getDatabaseManager().getDataSource().getConnection()) {
+            connection.setAutoCommit(false); // Start transaction
 
-            ps.setObject(1, player.getUniqueId());
-            ps.setString(2, warpName);
-            ps.setString(3, worldName);
-            ps.setDouble(4, x);
-            ps.setDouble(5, y);
-            ps.setDouble(6, z);
-            ps.setFloat(7, pitch);
-            ps.setFloat(8, yaw);
+            try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
-            ps.executeUpdate();
+                ps.setObject(1, player.getUniqueId());
+                ps.setString(2, warpName);
+                ps.setString(3, worldName);
+                ps.setDouble(4, x);
+                ps.setDouble(5, y);
+                ps.setDouble(6, z);
+                ps.setFloat(7, pitch);
+                ps.setFloat(8, yaw);
 
-            invalidateWarpCache();
+                ps.executeUpdate();
+                connection.commit(); // Commit the transaction if all goes well
 
-            if (plugin.getConfig().getBoolean("debug")) {
-                plugin.getLogger().info("Warp set by player " + player.getName() + " (" + player.getUniqueId() + ") at world: " + worldName + " x: " + x + " y: " + y + " z:" + z + " pitch: " + pitch + " yaw: " + yaw);
+                invalidateWarpCache(); // Invalidate the cache after setting the warp
+
+                if (plugin.getConfig().getBoolean("debug")) {
+                    plugin.getLogger().info("Warp set by player " + player.getName() + " (" + player.getUniqueId() + ") at world: " + worldName + " x: " + x + " y: " + y + " z:" + z + " pitch: " + pitch + " yaw: " + yaw);
+                }
+                return true;
+            } catch (SQLException e) {
+                connection.rollback(); // Rollback the transaction in case of an error
+                plugin.getLogger().warning("Error setting warp for player: " + e.getMessage() + " [SQLState: " + e.getSQLState() + ", ErrorCode: " + e.getErrorCode() + "]");
+                return false;
             }
-
-            return true;
         } catch (SQLException e) {
-            plugin.getLogger().warning("Error setting warp for player: " + e.getMessage());
+            plugin.getLogger().warning("Error setting warp for player: " + e.getMessage() + " [SQLState: " + e.getSQLState() + ", ErrorCode: " + e.getErrorCode() + "]");
             return false;
         }
     }
@@ -140,19 +148,28 @@ public class WarpManager {
         // SQL query to delete the warp
         String sql = "DELETE FROM warps WHERE warp_name = ?;";
 
-        try (Connection connection = plugin.getDatabaseManager().getDataSource().getConnection(); PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, warpName);
-            ps.executeUpdate();
+        try (Connection connection = plugin.getDatabaseManager().getDataSource().getConnection()) {
+            connection.setAutoCommit(false); // Start transaction
 
-            invalidateWarpCache();
+            try (PreparedStatement ps = connection.prepareStatement(sql)) {
+                ps.setString(1, warpName);
 
-            if (plugin.getConfig().getBoolean("debug")) {
-                plugin.getLogger().info("Warp deleted: " + warpName);
+                ps.executeUpdate();
+                connection.commit(); // Commit the transaction if all goes well
+
+                invalidateWarpCache(); // Invalidate the cache after deleting the warp
+
+                if (plugin.getConfig().getBoolean("debug")) {
+                    plugin.getLogger().info("Warp deleted: " + warpName);
+                }
+                return true;
+            } catch (SQLException e) {
+                connection.rollback(); // Rollback the transaction in case of an error
+                plugin.getLogger().warning("Error deleting warp: " + e.getMessage() + " [SQLState: " + e.getSQLState() + ", ErrorCode: " + e.getErrorCode() + "]");
+                return false;
             }
-
-            return true;
         } catch (SQLException e) {
-            plugin.getLogger().warning("Error deleting warp: " + e.getMessage());
+            plugin.getLogger().warning("Error deleting warp: " + e.getMessage() + " [SQLState: " + e.getSQLState() + ", ErrorCode: " + e.getErrorCode() + "]");
             return false;
         }
     }
@@ -176,6 +193,10 @@ public class WarpManager {
 
         // If the cache is still valid, return the cached warp names
         if (!forceRefresh && warpNamesCache != null && (currentTime - cacheTimestamp) < CACHE_EXPIRATION_TIME) {
+            if (plugin.getConfig().getBoolean("debug")) {
+                plugin.getLogger().info("Returning " + warpNamesCache.size() + " cached warp names: " + warpNamesCache);
+            }
+
             return warpNamesCache;
         }
 
