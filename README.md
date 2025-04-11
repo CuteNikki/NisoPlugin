@@ -184,6 +184,11 @@ Autocomplete:
 - **/fly**: Toggle flight mode on or off.
 - **/fly Player**: Toggle flight mode on or off for a target player.
 
+#### Vanish
+
+- **/vanish**: Toggle vanish mode on or off.
+- **/vanish Player**: Toggle vanish mode on or off for a target player.
+
 #### Warps
 
 - **/warp set Name**: Set a warp point at your current location.
@@ -199,6 +204,13 @@ Autocomplete:
 - **/home list**: List all home locations.
 
 ## Permissions
+
+#### Vanish
+
+- **niso.vanish.use**: Allows players to use the vanish command.
+- **niso.vanish.others**: Allows the player to toggle vanish on a target player.
+- **niso.vanish.bypass**: Allows the target player to bypass the vanish toggle.
+- **niso.vanish.see**: Allows the player to see vanished players.
 
 #### Fly
 
