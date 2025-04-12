@@ -120,7 +120,7 @@ public class WarpCommand implements TabExecutor {
                 return true;
             }
 
-            final List<String> warpNames = WarpManager.getWarpNames();
+            final List<String> warpNames = WarpManager.getWarpNames(true);
 
             if (warpNames.isEmpty()) {
                 player.sendMessage(plugin.prefixMessage(Component.text("There are no warps!").color(NamedTextColor.RED)));

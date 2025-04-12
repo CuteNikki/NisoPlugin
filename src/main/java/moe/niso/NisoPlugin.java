@@ -5,10 +5,7 @@ import moe.niso.commands.HomeCommand;
 import moe.niso.commands.VanishCommand;
 import moe.niso.commands.WarpCommand;
 import moe.niso.listeners.*;
-import moe.niso.managers.ConfigManager;
-import moe.niso.managers.DatabaseManager;
-import moe.niso.managers.TablistManager;
-import moe.niso.managers.VersionManager;
+import moe.niso.managers.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.luckperms.api.LuckPerms;
@@ -70,6 +67,10 @@ public final class NisoPlugin extends JavaPlugin {
 
         // Start the tablist manager
         tablistManager = new TablistManager();
+
+        // Start cache cleanup
+        HomeManager.startHomeCacheCleanup();
+        WarpManager.startWarpCacheCleanup();
 
         // Notify that the plugin is enabled
         getLogger().info(logPrefixManager + "Plugin is enabled!");
