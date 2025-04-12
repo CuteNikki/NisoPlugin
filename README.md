@@ -199,6 +199,7 @@ Autocomplete:
 #### Repair
 
 - **/repair**: Repair the item in your hand.
+- **/repair Player**: Repair a target player's item.
 
 #### Trash
 
@@ -207,18 +208,22 @@ Autocomplete:
 #### Enderchest
 
 - **/enderchest**: Open your ender chest.
+- **/enderchest Player**: Open a target player's ender chest.
 
 #### Feed
 
 - **/feed**: Feed yourself.
+- **/feed Player**: Feed a target player.
 
 #### Heal
 
 - **/heal**: Heal yourself.
+- **/heal Player**: Heal a target player.
 
 #### God
 
 - **/god**: Toggle god mode on or off.
+- **/god Player**: Toggle god mode on or off for a target player.
 
 #### Warps
 
@@ -252,6 +257,7 @@ Autocomplete:
 #### Repair
 
 - **niso.repair.use**: Allows players to use the repair command.
+- **niso.repair.others**: Allows the player to repair a target player's item.
 
 #### Trash
 
@@ -260,18 +266,24 @@ Autocomplete:
 #### Enderchest
 
 - **niso.enderchest.use**: Allows players to use the enderchest command.
+- **niso.enderchest.others**: Allows the player to open other player's ender chest.
+- **niso.enderchest.bypass**: Other players can open the player's ender chest.
 
 #### Feed
 
 - **niso.feed.use**: Allows players to use the feed command.
+- **niso.feed.others**: Allows the player to feed a target player.
 
 #### Heal
 
 - **niso.heal.use**: Allows players to use the heal command.
+- **niso.heal.others**: Allows the player to heal a target player.
 
 #### God
 
 - **niso.god.use**: Allows players to use the god command.
+- **niso.god.others**: Allows the player to toggle god mode on a target player.
+- **niso.god.bypass**: Allows the target player to bypass the god mode toggle.
 
 #### Warps
 
