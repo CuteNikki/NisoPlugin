@@ -33,6 +33,7 @@ formatting.
 - **Vanish**: Toggle vanish mode for yourself or other players.
 - **Repair**: Repair the item in your hand.
 - **Trash**: Open a trash bin to delete items.
+- **Enderchest**: Open an ender chest.
 - **Autocomplete**: Autocomplete commands for warps, homes and more.
 - **Customizable Server MOTD**: Set a custom Message of the Day (MOTD) using MiniMessage formatting.
 - **Customizable Join/Leave Messages**: Customize join and leave messages with MiniMessage and PlaceholderAPI support.
@@ -200,6 +201,10 @@ Autocomplete:
 
 - **/trash**: Open a trash bin to delete items.
 
+#### Enderchest
+
+- **/enderchest**: Open your ender chest.
+
 #### Warps
 
 - **/warp set Name**: Set a warp point at your current location.
@@ -236,6 +241,10 @@ Autocomplete:
 #### Trash
 
 - **niso.trash.use**: Allows players to use the trash command.
+
+#### Enderchest
+
+- **niso.enderchest.use**: Allows players to use the enderchest command.
 
 #### Warps
 

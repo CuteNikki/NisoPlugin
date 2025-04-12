@@ -36,3 +36,8 @@ commands:
     usage: /trash
     aliases: [ bin, garbage ]
     permission: niso.trash.use
+  enderchest:
+    description: Opens the enderchest
+    usage: /enderchest
+    aliases: [ ec ]
+    permission: niso.enderchest.use
