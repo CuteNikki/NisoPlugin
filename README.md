@@ -22,7 +22,7 @@ formatting.
 - [Permissions](#permissions)
   - [Warps](#warps-1)
   - [Homes](#homes-1)
-- [Permission Group Examples](permission-group-examples)
+- [Permission Group Examples](#permission-group-examples)
 - [Support](#support)
 - [License](#license)
 
