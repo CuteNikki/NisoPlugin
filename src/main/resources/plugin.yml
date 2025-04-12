@@ -46,3 +46,8 @@ commands:
     usage: /feed
     aliases: [ eat, food ]
     permission: niso.feed.use
+  heal:
+    description: Restores the health bar
+    usage: /heal
+    aliases: [ health ]
+    permission: niso.heal.use

@@ -35,7 +35,8 @@ formatting.
 - **Trash**: Open a trash bin to delete items.
 - **Enderchest**: Open an ender chest.
 - **Feed**: Takes care of hunger for a while.
-- **Autocomplete**: Autocomplete commands for warps, homes and more.
+- **Heal**: Heal yourself.
+- **Autocomplete**: Autocompletion for things like warps, homes and more.
 - **Customizable Server MOTD**: Set a custom Message of the Day (MOTD) using MiniMessage formatting.
 - **Customizable Join/Leave Messages**: Customize join and leave messages with MiniMessage and PlaceholderAPI support.
 - **Customizable Chat Format**: Customize the chat format using MiniMessage.
@@ -210,6 +211,10 @@ Autocomplete:
 
 - **/feed**: Feed yourself.
 
+#### Heal
+
+- **/heal**: Heal yourself.
+
 #### Warps
 
 - **/warp set Name**: Set a warp point at your current location.
@@ -254,6 +259,10 @@ Autocomplete:
 #### Feed
 
 - **niso.feed.use**: Allows players to use the feed command.
+
+#### Heal
+
+- **niso.heal.use**: Allows players to use the heal command.
 
 #### Warps
 

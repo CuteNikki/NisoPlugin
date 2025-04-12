@@ -103,6 +103,7 @@ public final class NisoPlugin extends JavaPlugin {
         getCmd("trash").setExecutor(new TrashCommand());
         getCmd("enderchest").setExecutor(new EnderchestCommand());
         getCmd("feed").setExecutor(new FeedCommand());
+        getCmd("heal").setExecutor(new HealCommand());
 
         getLogger().info(logPrefixManager + "Commands registered!");
     }
