@@ -20,6 +20,28 @@ public class JoinListener implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         final Player player = event.getPlayer();
 
+        // If the joining player is vanished, hide them from other players
+        if (player.hasMetadata("vanished")) {
+            for (Player onlinePlayer : plugin.getServer().getOnlinePlayers()) {
+                if (!onlinePlayer.hasPermission("niso.vanish.see")) {
+                    player.hidePlayer(plugin, onlinePlayer);
+                } else {
+                    player.showPlayer(plugin, onlinePlayer);
+                }
+            }
+        }
+
+        // If an online player is vanished, hide them from the joining player
+        for (Player onlinePlayer : plugin.getServer().getOnlinePlayers()) {
+            if (onlinePlayer.hasMetadata("vanished")) {
+                if (player.hasPermission("niso.vanish.see")) {
+                    player.showPlayer(plugin, onlinePlayer);
+                } else {
+                    player.hidePlayer(plugin, onlinePlayer);
+                }
+            }
+        }
+
         // Sending welcome messages
 
         final ConfigurationSection welcomeConfig = plugin.getConfig().getConfigurationSection("welcome-message");
@@ -59,7 +81,6 @@ public class JoinListener implements Listener {
                 player.sendMessage(updateMessageComponent);
             }
         }
-
 
         // Updating the tablist
         final ConfigurationSection tablistConfig = plugin.getConfig().getConfigurationSection("tablist");

@@ -18,3 +18,11 @@ commands:
     usage: /home <set/delete/list/teleport> [name]
     aliases: [ h ]
     permission: niso.home.use
+  fly:
+    description: Toggles the flight mode
+    usage: /fly [player]
+    permission: niso.fly.use
+  vanish:
+    description: Toggles the vanish mode
+    usage: /vanish [player]
+    permission: niso.vanish.use
