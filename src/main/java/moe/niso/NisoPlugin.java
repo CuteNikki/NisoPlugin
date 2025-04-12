@@ -1,9 +1,6 @@
 package moe.niso;
 
-import moe.niso.commands.FlyCommand;
-import moe.niso.commands.HomeCommand;
-import moe.niso.commands.VanishCommand;
-import moe.niso.commands.WarpCommand;
+import moe.niso.commands.*;
 import moe.niso.listeners.*;
 import moe.niso.managers.*;
 import net.kyori.adventure.text.Component;
@@ -102,6 +99,7 @@ public final class NisoPlugin extends JavaPlugin {
         getCmd("warp").setExecutor(new WarpCommand());
         getCmd("fly").setExecutor(new FlyCommand());
         getCmd("vanish").setExecutor(new VanishCommand());
+        getCmd("repair").setExecutor(new RepairCommand());
 
         getLogger().info(logPrefixManager + "Commands registered!");
     }

@@ -26,3 +26,8 @@ commands:
     description: Toggles the vanish mode
     usage: /vanish [player]
     permission: niso.vanish.use
+  repair:
+    description: Repairs the item in the main hand
+    usage: /repair
+    aliases: [ fix ]
+    permission: niso.repair.use
