@@ -41,3 +41,8 @@ commands:
     usage: /enderchest
     aliases: [ ec ]
     permission: niso.enderchest.use
+  feed:
+    description: Restores the hunger bar
+    usage: /feed
+    aliases: [ eat, food ]
+    permission: niso.feed.use
