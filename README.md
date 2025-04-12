@@ -23,6 +23,9 @@ formatting.
   - [Warps](#warps-1)
   - [Homes](#homes-1)
 - [Permission Group Examples](#permission-group-examples)
+  - [Admin](#admin-inherits-from-moderator)
+  - [Moderator](#moderator-inherits-from-player)
+  - [Player](#player)
 - [Support](#support)
 - [License](#license)
 
