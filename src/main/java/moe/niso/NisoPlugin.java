@@ -100,6 +100,7 @@ public final class NisoPlugin extends JavaPlugin {
         getCmd("fly").setExecutor(new FlyCommand());
         getCmd("vanish").setExecutor(new VanishCommand());
         getCmd("repair").setExecutor(new RepairCommand());
+        getCmd("trash").setExecutor(new TrashCommand());
 
         getLogger().info(logPrefixManager + "Commands registered!");
     }
@@ -114,6 +115,8 @@ public final class NisoPlugin extends JavaPlugin {
         manager.registerEvents(new LeaveListener(), this);
         manager.registerEvents(new ChatListener(), this);
         manager.registerEvents(new MotdListener(), this);
+        manager.registerEvents(new InventoryListener(), this);
+
         getLogger().info(logPrefixManager + "Events registered!");
     }
 

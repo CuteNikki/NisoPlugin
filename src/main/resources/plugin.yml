@@ -31,3 +31,8 @@ commands:
     usage: /repair
     aliases: [ fix ]
     permission: niso.repair.use
+  trash:
+    description: Deletes the items you put into the inventory
+    usage: /trash
+    aliases: [ bin, garbage ]
+    permission: niso.trash.use
