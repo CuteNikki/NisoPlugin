@@ -34,6 +34,7 @@ formatting.
 - **Repair**: Repair the item in your hand.
 - **Trash**: Open a trash bin to delete items.
 - **Enderchest**: Open an ender chest.
+- **Invsee**: View the inventory of other players.
 - **Feed**: Takes care of hunger for a while.
 - **Heal**: Heal yourself.
 - **God Mode**: Toggle god mode for yourself.
@@ -210,6 +211,10 @@ Autocomplete:
 - **/enderchest**: Open your ender chest.
 - **/enderchest Player**: Open a target player's ender chest.
 
+#### Invsee
+
+- **/invsee Player**: View the inventory of a target player.
+
 #### Feed
 
 - **/feed**: Feed yourself.
@@ -245,13 +250,13 @@ Autocomplete:
 
 - **niso.fly.use**: Allows players to use the fly command.
 - **niso.fly.others**: Allows the player to toggle flight on a target player.
-- **niso.fly.bypass**: Allows the target player to bypass the flight toggle.
+- **niso.fly.bypass**: Other players cannot toggle flight for the player.
 
 #### Vanish
 
 - **niso.vanish.use**: Allows players to use the vanish command.
 - **niso.vanish.others**: Allows the player to toggle vanish on a target player.
-- **niso.vanish.bypass**: Allows the target player to bypass the vanish toggle.
+- **niso.vanish.bypass**: Other players cannot toggle vanish for the player.
 - **niso.vanish.see**: Allows the player to see vanished players.
 
 #### Repair
@@ -267,7 +272,12 @@ Autocomplete:
 
 - **niso.enderchest.use**: Allows players to use the enderchest command.
 - **niso.enderchest.others**: Allows the player to open other player's ender chest.
-- **niso.enderchest.bypass**: Other players can open the player's ender chest.
+- **niso.enderchest.bypass**: Other players cannot open the player's ender chest.
+
+#### Invsee
+
+- **niso.invsee.use**: Allows players to use the invsee command.
+- **niso.invsee.bypass**: Other players cannot open the player's inventory.
 
 #### Feed
 
@@ -283,7 +293,7 @@ Autocomplete:
 
 - **niso.god.use**: Allows players to use the god command.
 - **niso.god.others**: Allows the player to toggle god mode on a target player.
-- **niso.god.bypass**: Allows the target player to bypass the god mode toggle.
+- **niso.god.bypass**: Other players cannot toggle god mode for the player.
 
 #### Warps
 

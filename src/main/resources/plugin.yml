@@ -56,3 +56,8 @@ commands:
     usage: /god
     aliases: [ immortal, invincible, godmode ]
     permission: niso.god.use
+  invsee:
+    description: Opens the inventory of another player
+    usage: /invsee <player>
+    aliases: [ inventorysee, seeinventory, seeinv, inv, inventory ]
+    permission: niso.invsee.use
