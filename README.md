@@ -30,7 +30,15 @@ formatting.
 - **Warps**: Set and manage warp points for easy teleportation.
 - **Homes**: Allow players to set and teleport to their homes.
 - **Fly**: Toggle flight mode for yourself or other players.
-- **Autocomplete**: Autocomplete commands for warps, homes and more.
+- **Vanish**: Toggle vanish mode for yourself or other players.
+- **Repair**: Repair the item in your hand.
+- **Trash**: Open a trash bin to delete items.
+- **Enderchest**: Open an ender chest.
+- **Invsee**: View the inventory of other players.
+- **Feed**: Takes care of hunger for a while.
+- **Heal**: Heal yourself.
+- **God Mode**: Toggle god mode for yourself.
+- **Autocomplete**: Autocompletion for things like warps, homes and more.
 - **Customizable Server MOTD**: Set a custom Message of the Day (MOTD) using MiniMessage formatting.
 - **Customizable Join/Leave Messages**: Customize join and leave messages with MiniMessage and PlaceholderAPI support.
 - **Customizable Chat Format**: Customize the chat format using MiniMessage.
@@ -189,6 +197,39 @@ Autocomplete:
 - **/vanish**: Toggle vanish mode on or off.
 - **/vanish Player**: Toggle vanish mode on or off for a target player.
 
+#### Repair
+
+- **/repair**: Repair the item in your hand.
+- **/repair Player**: Repair a target player's item.
+
+#### Trash
+
+- **/trash**: Open a trash bin to delete items.
+
+#### Enderchest
+
+- **/enderchest**: Open your ender chest.
+- **/enderchest Player**: Open a target player's ender chest.
+
+#### Invsee
+
+- **/invsee Player**: View the inventory of a target player.
+
+#### Feed
+
+- **/feed**: Feed yourself.
+- **/feed Player**: Feed a target player.
+
+#### Heal
+
+- **/heal**: Heal yourself.
+- **/heal Player**: Heal a target player.
+
+#### God
+
+- **/god**: Toggle god mode on or off.
+- **/god Player**: Toggle god mode on or off for a target player.
+
 #### Warps
 
 - **/warp set Name**: Set a warp point at your current location.
@@ -205,18 +246,54 @@ Autocomplete:
 
 ## Permissions
 
-#### Vanish
-
-- **niso.vanish.use**: Allows players to use the vanish command.
-- **niso.vanish.others**: Allows the player to toggle vanish on a target player.
-- **niso.vanish.bypass**: Allows the target player to bypass the vanish toggle.
-- **niso.vanish.see**: Allows the player to see vanished players.
-
 #### Fly
 
 - **niso.fly.use**: Allows players to use the fly command.
 - **niso.fly.others**: Allows the player to toggle flight on a target player.
-- **niso.fly.bypass**: Allows the target player to bypass the flight toggle.
+- **niso.fly.bypass**: Other players cannot toggle flight for the player.
+
+#### Vanish
+
+- **niso.vanish.use**: Allows players to use the vanish command.
+- **niso.vanish.others**: Allows the player to toggle vanish on a target player.
+- **niso.vanish.bypass**: Other players cannot toggle vanish for the player.
+- **niso.vanish.see**: Allows the player to see vanished players.
+
+#### Repair
+
+- **niso.repair.use**: Allows players to use the repair command.
+- **niso.repair.others**: Allows the player to repair a target player's item.
+
+#### Trash
+
+- **niso.trash.use**: Allows players to use the trash command.
+
+#### Enderchest
+
+- **niso.enderchest.use**: Allows players to use the enderchest command.
+- **niso.enderchest.others**: Allows the player to open other player's ender chest.
+- **niso.enderchest.bypass**: Other players cannot open the player's ender chest.
+
+#### Invsee
+
+- **niso.invsee.use**: Allows players to use the invsee command.
+- **niso.invsee.bypass**: Other players cannot open the player's inventory.
+
+#### Feed
+
+- **niso.feed.use**: Allows players to use the feed command.
+- **niso.feed.others**: Allows the player to feed a target player.
+
+#### Heal
+
+- **niso.heal.use**: Allows players to use the heal command.
+- **niso.heal.others**: Allows the player to heal a target player.
+
+#### God
+
+- **niso.god.use**: Allows players to use the god command.
+- **niso.god.others**: Allows the player to toggle god mode on a target player.
+- **niso.god.bypass**: Other players cannot toggle god mode for the player.
 
 #### Warps
 

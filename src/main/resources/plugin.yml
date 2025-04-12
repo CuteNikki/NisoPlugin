@@ -26,3 +26,38 @@ commands:
     description: Toggles the vanish mode
     usage: /vanish [player]
     permission: niso.vanish.use
+  repair:
+    description: Repairs the item in the main hand
+    usage: /repair
+    aliases: [ fix ]
+    permission: niso.repair.use
+  trash:
+    description: Deletes the items you put into the inventory
+    usage: /trash
+    aliases: [ bin, garbage ]
+    permission: niso.trash.use
+  enderchest:
+    description: Opens the enderchest
+    usage: /enderchest
+    aliases: [ ec ]
+    permission: niso.enderchest.use
+  feed:
+    description: Restores the hunger bar
+    usage: /feed
+    aliases: [ eat, food ]
+    permission: niso.feed.use
+  heal:
+    description: Restores the health bar
+    usage: /heal
+    aliases: [ health ]
+    permission: niso.heal.use
+  god:
+    description: Toggles the god mode
+    usage: /god
+    aliases: [ immortal, invincible, godmode ]
+    permission: niso.god.use
+  invsee:
+    description: Opens the inventory of another player
+    usage: /invsee <player>
+    aliases: [ inventorysee, seeinventory, seeinv, inv, inventory ]
+    permission: niso.invsee.use

@@ -1,9 +1,6 @@
 package moe.niso;
 
-import moe.niso.commands.FlyCommand;
-import moe.niso.commands.HomeCommand;
-import moe.niso.commands.VanishCommand;
-import moe.niso.commands.WarpCommand;
+import moe.niso.commands.*;
 import moe.niso.listeners.*;
 import moe.niso.managers.*;
 import net.kyori.adventure.text.Component;
@@ -102,6 +99,13 @@ public final class NisoPlugin extends JavaPlugin {
         getCmd("warp").setExecutor(new WarpCommand());
         getCmd("fly").setExecutor(new FlyCommand());
         getCmd("vanish").setExecutor(new VanishCommand());
+        getCmd("repair").setExecutor(new RepairCommand());
+        getCmd("trash").setExecutor(new TrashCommand());
+        getCmd("enderchest").setExecutor(new EnderchestCommand());
+        getCmd("feed").setExecutor(new FeedCommand());
+        getCmd("heal").setExecutor(new HealCommand());
+        getCmd("god").setExecutor(new GodCommand());
+        getCmd("invsee").setExecutor(new InvseeCommand());
 
         getLogger().info(logPrefixManager + "Commands registered!");
     }
@@ -116,6 +120,8 @@ public final class NisoPlugin extends JavaPlugin {
         manager.registerEvents(new LeaveListener(), this);
         manager.registerEvents(new ChatListener(), this);
         manager.registerEvents(new MotdListener(), this);
+        manager.registerEvents(new InventoryListener(), this);
+
         getLogger().info(logPrefixManager + "Events registered!");
     }
 
