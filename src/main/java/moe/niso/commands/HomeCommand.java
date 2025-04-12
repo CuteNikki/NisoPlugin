@@ -153,7 +153,9 @@ public class HomeCommand implements TabExecutor {
                 return List.of();
             }
 
-            return HomeManager.getHomeNames(player);
+            return HomeManager.getHomeNames(player).stream()
+                    .filter(homeName -> homeName.toLowerCase().startsWith(args[1].toLowerCase()))
+                    .toList();
         }
 
         return List.of();
