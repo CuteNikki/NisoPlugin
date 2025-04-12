@@ -30,6 +30,9 @@ formatting.
 - **Warps**: Set and manage warp points for easy teleportation.
 - **Homes**: Allow players to set and teleport to their homes.
 - **Fly**: Toggle flight mode for yourself or other players.
+- **Vanish**: Toggle vanish mode for yourself or other players.
+- **Repair**: Repair the item in your hand.
+- **Trash**: Open a trash bin to delete items.
 - **Autocomplete**: Autocomplete commands for warps, homes and more.
 - **Customizable Server MOTD**: Set a custom Message of the Day (MOTD) using MiniMessage formatting.
 - **Customizable Join/Leave Messages**: Customize join and leave messages with MiniMessage and PlaceholderAPI support.
@@ -189,6 +192,14 @@ Autocomplete:
 - **/vanish**: Toggle vanish mode on or off.
 - **/vanish Player**: Toggle vanish mode on or off for a target player.
 
+#### Repair
+
+- **/repair**: Repair the item in your hand.
+
+#### Trash
+
+- **/trash**: Open a trash bin to delete items.
+
 #### Warps
 
 - **/warp set Name**: Set a warp point at your current location.
@@ -205,6 +216,12 @@ Autocomplete:
 
 ## Permissions
 
+#### Fly
+
+- **niso.fly.use**: Allows players to use the fly command.
+- **niso.fly.others**: Allows the player to toggle flight on a target player.
+- **niso.fly.bypass**: Allows the target player to bypass the flight toggle.
+
 #### Vanish
 
 - **niso.vanish.use**: Allows players to use the vanish command.
@@ -212,11 +229,13 @@ Autocomplete:
 - **niso.vanish.bypass**: Allows the target player to bypass the vanish toggle.
 - **niso.vanish.see**: Allows the player to see vanished players.
 
-#### Fly
+#### Repair
 
-- **niso.fly.use**: Allows players to use the fly command.
-- **niso.fly.others**: Allows the player to toggle flight on a target player.
-- **niso.fly.bypass**: Allows the target player to bypass the flight toggle.
+- **niso.repair.use**: Allows players to use the repair command.
+
+#### Trash
+
+- **niso.trash.use**: Allows players to use the trash command.
 
 #### Warps
 
