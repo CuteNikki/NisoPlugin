@@ -22,6 +22,7 @@ formatting.
 - [Permissions](#permissions)
   - [Warps](#warps-1)
   - [Homes](#homes-1)
+- [Permission Group Examples](permission-group-examples)
 - [Support](#support)
 - [License](#license)
 
@@ -311,6 +312,51 @@ Autocomplete:
 - **niso.home.teleport**: Allows players to teleport to home locations.
 - **niso.home.list**: Allows players to list home locations.
 - **niso.home.limit-(number)**: Allows players to set a specific number (up to 50) of home locations (`niso.home.limit-3` for a max of 3 homes).
+
+## Permission Group Examples:
+
+#### Admin (Inherits from Moderator):
+
+- niso.heal.others
+- niso.feed.others
+- niso.repair.others
+- niso.fly.bypass
+- niso.fly.others
+- niso.god.bypass
+- niso.god.others
+- niso.enderchest.bypass
+- niso.enderchest.others
+- niso.invsee.use
+- niso.invsee.bypass
+- niso.vanish.bypass
+- niso.home.limit-50
+
+#### Moderator (Inherits from Player):
+
+- niso.feed.use
+- niso.heal.use
+- niso.fly.use
+- niso.god.use
+- niso.repair.use
+- niso.warp.set
+- niso.warp.delete
+- niso.vanish.use
+- niso.vanish.see
+- niso.home.limit-10
+
+#### Player:
+
+- niso.trash.use
+- niso.warp.use
+- niso.warp.list
+- niso.warp.teleport
+- niso.enderchest.use
+- niso.home.use
+- niso.home.list
+- niso.home.set
+- niso.home.teleport
+- niso.home.delete
+- niso.home.limit-3
 
 ## Support
 
