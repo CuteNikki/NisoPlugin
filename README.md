@@ -36,6 +36,7 @@ formatting.
 - **Enderchest**: Open an ender chest.
 - **Feed**: Takes care of hunger for a while.
 - **Heal**: Heal yourself.
+- **God Mode**: Toggle god mode for yourself.
 - **Autocomplete**: Autocompletion for things like warps, homes and more.
 - **Customizable Server MOTD**: Set a custom Message of the Day (MOTD) using MiniMessage formatting.
 - **Customizable Join/Leave Messages**: Customize join and leave messages with MiniMessage and PlaceholderAPI support.
@@ -215,6 +216,10 @@ Autocomplete:
 
 - **/heal**: Heal yourself.
 
+#### God
+
+- **/god**: Toggle god mode on or off.
+
 #### Warps
 
 - **/warp set Name**: Set a warp point at your current location.
@@ -263,6 +268,10 @@ Autocomplete:
 #### Heal
 
 - **niso.heal.use**: Allows players to use the heal command.
+
+#### God
+
+- **niso.god.use**: Allows players to use the god command.
 
 #### Warps
 
