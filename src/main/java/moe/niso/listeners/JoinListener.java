@@ -77,8 +77,8 @@ public class JoinListener implements Listener {
             final boolean updateAvailable = VersionManager.isNewerVersion(currentVersion, newestVersion);
 
             if (updateAvailable) {
-                final Component updateMessageComponent = Component.text("An update is available!").color(NamedTextColor.GREEN).append(Component.newline()).append(Component.text("Current version: " + currentVersion).color(NamedTextColor.RED)).append(Component.newline()).append(Component.text("Newest version: " + newestVersion).color(NamedTextColor.AQUA));
-                player.sendMessage(updateMessageComponent);
+                final Component updateMessageComponent = Component.text("An update for the plugin is available!").color(NamedTextColor.GREEN).append(Component.newline()).append(Component.text("Current version: " + currentVersion).color(NamedTextColor.RED)).append(Component.newline()).append(Component.text("Newest version: " + newestVersion).color(NamedTextColor.AQUA));
+                player.sendMessage(plugin.prefixMessage(updateMessageComponent));
             }
         }
 
