@@ -106,6 +106,10 @@ public final class NisoPlugin extends JavaPlugin {
         getCmd("heal").setExecutor(new HealCommand());
         getCmd("god").setExecutor(new GodCommand());
         getCmd("invsee").setExecutor(new InvseeCommand());
+        getCmd("tpask").setExecutor(new TeleportAskCommand());
+        getCmd("tpaccept").setExecutor(new TeleportAcceptCommand());
+        getCmd("tpdeny").setExecutor(new TeleportDenyCommand());
+        getCmd("tplist").setExecutor(new TeleportListCommand());
 
         getLogger().info(logPrefixManager + "Commands registered!");
     }

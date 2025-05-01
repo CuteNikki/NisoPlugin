@@ -61,3 +61,23 @@ commands:
     usage: /invsee <player>
     aliases: [ inventorysee, seeinventory, seeinv, inv, inventory ]
     permission: niso.invsee.use
+  tpask:
+    description: Teleport to another player
+    usage: /tpa <player>
+    aliases: [ tpa, tpr, teleportask, teleportrequest ]
+    permission: niso.tpask.use
+  tpaccept:
+    description: Accept a teleport request
+    usage: /tpaccept
+    aliases: [ teleportaccept, teleportrequestaccept ]
+    permission: niso.tpaccept.use
+  tpdeny:
+    description: Deny a teleport request
+    usage: /tpdeny
+    aliases: [ teleportdeny, teleportrequestdeny ]
+    permission: niso.tpdeny.use
+  tplist:
+    description: List all teleport requests
+    usage: /tplist
+    aliases: [ teleportlist, teleportrequestlist ]
+    permission: niso.tplist.use

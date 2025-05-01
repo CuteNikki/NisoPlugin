@@ -33,6 +33,7 @@ formatting.
 
 - **Warps**: Set and manage warp points for easy teleportation.
 - **Homes**: Allow players to set and teleport to their homes.
+- **Teleport Asks**: Players can ask for teleportation to other players.
 - **Fly**: Toggle flight mode for yourself or other players.
 - **Vanish**: Toggle vanish mode for yourself or other players.
 - **Repair**: Repair the item in your hand.
@@ -248,6 +249,13 @@ Autocomplete:
 - **/home tp Name**: Teleport to your home location.
 - **/home list**: List all home locations.
 
+#### Teleport Asks
+
+- **/tpask Player**: Ask a target player for teleportation.
+- **/tpaccept Player**: Accept a teleportation request from a Player.
+- **/tpdeny Player**: Deny a teleportation request from a Player.
+- **/tplist**: List all teleportation requests.
+
 ## Permissions
 
 #### Fly
@@ -316,6 +324,13 @@ Autocomplete:
 - **niso.home.list**: Allows players to list home locations.
 - **niso.home.limit-(number)**: Allows players to set a specific number (up to 50) of home locations (`niso.home.limit-3` for a max of 3 homes).
 
+#### Teleport Asks
+
+- **niso.tpask.use**: Allows players to ask for teleportation to other players.
+- **niso.tpaccept.use**: Allows players to accept teleportation requests.
+- **niso.tpdeny.use**: Allows players to deny teleportation requests.
+- **niso.tplist.use**: Allows players to list teleportation requests.
+
 ## Permission Group Examples:
 
 #### Admin (Inherits from Moderator):
@@ -360,6 +375,10 @@ Autocomplete:
 - niso.home.teleport
 - niso.home.delete
 - niso.home.limit-3
+- niso.tpask.use
+- niso.tpaccept.use
+- niso.tpdeny.use
+- niso.tplist.use
 
 ## Support
 
