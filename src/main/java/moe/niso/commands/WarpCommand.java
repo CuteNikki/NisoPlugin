@@ -142,7 +142,7 @@ public class WarpCommand implements TabExecutor {
         }
 
         if (args.length == 2 && List.of("teleport", "tp", "delete", "set").contains(args[0].toLowerCase())) {
-            return WarpManager.getWarpNames(false).stream()
+            return WarpManager.getWarpNames().stream()
                     .filter(name -> name.toLowerCase().startsWith(args[1].toLowerCase()))
                     .toList();
         }
