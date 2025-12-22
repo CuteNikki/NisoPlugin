@@ -1,5 +1,6 @@
 package moe.niso.listeners;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import moe.niso.NisoPlugin;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -26,8 +27,8 @@ public class MotdListener implements Listener {
             return;
         }
 
-        final Component firstLineComponent = MiniMessage.miniMessage().deserialize(firstLine);
-        final Component secondLineComponent = MiniMessage.miniMessage().deserialize(secondLine);
+        final Component firstLineComponent = MiniMessage.miniMessage().deserialize(PlaceholderAPI.setPlaceholders(null, firstLine));
+        final Component secondLineComponent = MiniMessage.miniMessage().deserialize(PlaceholderAPI.setPlaceholders(null, secondLine));
 
         event.motd(firstLineComponent.append(Component.newline()).append(secondLineComponent));
 
