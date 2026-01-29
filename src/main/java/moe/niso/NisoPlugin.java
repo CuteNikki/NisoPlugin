@@ -3,6 +3,7 @@ package moe.niso;
 import moe.niso.commands.*;
 import moe.niso.listeners.*;
 import moe.niso.managers.*;
+import moe.niso.web.ResourcePackServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.luckperms.api.LuckPerms;
@@ -21,6 +22,7 @@ public final class NisoPlugin extends JavaPlugin {
     private DatabaseManager databaseManager;
     private TablistManager tablistManager;
     private LuckPerms luckPerms;
+    private ResourcePackServer packServer;
 
     /**
      * Get the plugin instance.
@@ -54,6 +56,7 @@ public final class NisoPlugin extends JavaPlugin {
         initialiseDatabase();
         initialisePlaceholderAPI();
         initialiseLuckPerms();
+        initialiseResourcePackServer();
 
         // Checking for a new version
         updateCheck();
@@ -87,6 +90,8 @@ public final class NisoPlugin extends JavaPlugin {
         if (tablistManager != null) {
             tablistManager.stop();
         }
+
+        stopResourcePackServer();
 
         getLogger().info(logPrefixManager + "Plugin is disabled!");
     }
@@ -184,6 +189,29 @@ public final class NisoPlugin extends JavaPlugin {
             getLogger().severe(logPrefixManager + "LuckPerms is not installed!");
             getLogger().severe(logPrefixManager + "Disabling plugin...");
             Bukkit.getPluginManager().disablePlugin(this);
+        }
+    }
+
+    /**
+     * Initialise the resource pack server if enabled in the config.
+     */
+    private void initialiseResourcePackServer() {
+        final boolean resourcePackEnabled = getConfig().getBoolean("resource-pack.enabled");
+        if (resourcePackEnabled) {
+            final int serverPort = getConfig().getInt("resource-pack.server-port", 8080);
+            packServer = new ResourcePackServer();
+            packServer.start(serverPort);
+            getLogger().info(logPrefixManager + "Resource Pack Server started on port " + serverPort);
+        }
+    }
+
+    /**
+     * Stop the resource pack server if it's running.
+     */
+    private void stopResourcePackServer() {
+        if (packServer != null) {
+            packServer.stop();
+            getLogger().info(logPrefixManager + "Resource Pack Server stopped.");
         }
     }
 

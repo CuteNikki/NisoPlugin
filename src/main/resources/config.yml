@@ -81,3 +81,13 @@ database:
   username: username
   password: super_secret
   pool-size: 10
+
+# Resource Pack Configuration
+#
+# To enable the resource pack, set 'enabled' to true and put a resource pack in the same folder as this config.
+resource-pack:
+  enabled: false
+  server-port: 8080
+  file-name: resource_pack.zip
+  prompt-message: <red>Resource Pack Download</red>
+  force-download: false

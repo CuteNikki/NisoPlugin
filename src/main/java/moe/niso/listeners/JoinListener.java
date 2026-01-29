@@ -4,6 +4,7 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import moe.niso.NisoPlugin;
 import moe.niso.managers.TablistManager;
 import moe.niso.managers.VersionManager;
+import moe.niso.web.ResourcePackServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -13,12 +14,25 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
+import java.io.File;
+
 public class JoinListener implements Listener {
     private final NisoPlugin plugin = NisoPlugin.getInstance();
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         final Player player = event.getPlayer();
+
+        boolean resourcePackEnabled = plugin.getConfig().getBoolean("resource-pack.enabled");
+        if (resourcePackEnabled) {
+            String resourcePackFileName = plugin.getConfig().getString("resource-pack.file-name", "resource_pack.zip");
+            int serverPort = plugin.getConfig().getInt("resource-pack.server-port", 8080);
+            String resourcePackURL = "http://" + plugin.getServer().getIp() + ":" + serverPort + "/" + resourcePackFileName;
+            boolean forceDownload = plugin.getConfig().getBoolean("resource-pack.force-download", false);
+            String promptMessage = plugin.getConfig().getString("resource-pack.prompt-message", "<red>Resource Pack Download");
+            File resourcePackFile = new File(plugin.getDataFolder(), resourcePackFileName);
+            player.setResourcePack(resourcePackURL, ResourcePackServer.getFileHash(resourcePackFile), MiniMessage.miniMessage().deserialize(promptMessage), forceDownload);
+        }
 
         // If the joining player is vanished, hide them from other players
         if (player.hasMetadata("vanished")) {

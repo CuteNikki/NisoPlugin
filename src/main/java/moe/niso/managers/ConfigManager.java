@@ -52,6 +52,11 @@ public class ConfigManager {
         validateConfigKey(config, "database.username", "username", Type.STRING);
         validateConfigKey(config, "database.password", "super_secret", Type.STRING);
         validateConfigKey(config, "database.pool-size", 10, Type.INT);
+        validateConfigKey(config, "resource-pack.enabled", false, Type.BOOLEAN);
+        validateConfigKey(config, "resource-pack.file-name", "resource_pack.zip", Type.STRING);
+        validateConfigKey(config, "resource-pack.server-port", 8080, Type.INT);
+        validateConfigKey(config, "resource-pack.prompt-message", "<red>Resource Pack Download", Type.STRING);
+        validateConfigKey(config, "resource-pack.force-download", false, Type.BOOLEAN);
 
         try {
             config.save(configFile);
