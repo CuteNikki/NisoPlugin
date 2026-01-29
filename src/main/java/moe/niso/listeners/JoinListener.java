@@ -27,7 +27,7 @@ public class JoinListener implements Listener {
         if (resourcePackEnabled) {
             String resourcePackFileName = plugin.getConfig().getString("resource-pack.file-name", "resource_pack.zip");
             int serverPort = plugin.getConfig().getInt("resource-pack.server-port", 8080);
-            String resourcePackURL = "http://" + plugin.getServer().getIp() + ":" + serverPort + "/" + resourcePackFileName;
+            String resourcePackURL = "http://" + plugin.getConfig().getString("resource-pack.server-ip", "localhost") + ":" + serverPort + "/" + resourcePackFileName;
             boolean forceDownload = plugin.getConfig().getBoolean("resource-pack.force-download", false);
             String promptMessage = plugin.getConfig().getString("resource-pack.prompt-message", "<red>Resource Pack Download");
             File resourcePackFile = new File(plugin.getDataFolder(), resourcePackFileName);

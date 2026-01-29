@@ -22,7 +22,7 @@ public class ResourcePackServer {
     public void start(int port) {
         try {
             server = HttpServer.create(new InetSocketAddress(port), 0);
-            server.createContext("resource_pack.zip", exchange -> {
+            server.createContext("/resource_pack.zip", exchange -> {
                 File resourcePackFile = new File(plugin.getDataFolder(), plugin.getConfig().getString("resource-pack.file-name", "resource_pack.zip"));
                 if (!resourcePackFile.exists()) {
                     String response = "Resource pack not found.";
