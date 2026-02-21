@@ -14,6 +14,7 @@ import java.security.MessageDigest;
 public class ResourcePackServer {
     private final NisoPlugin plugin = NisoPlugin.getInstance();
     private HttpServer server;
+    private byte[] cachedHash;
 
     /**
      * Starts the HTTP server on the specified port.
@@ -21,15 +22,26 @@ public class ResourcePackServer {
      */
     public void start(int port) {
         try {
+            String fileName = plugin.getConfig().getString("resource-pack.file-name", "resource_pack.zip");
+            File resourcePackFile = new File(plugin.getDataFolder(), fileName);
+
+            if (resourcePackFile.exists()) {
+                cachedHash = calculateFileHash(resourcePackFile);
+            } else {
+                cachedHash = new byte[0];
+                plugin.getLogger().warning("Resource pack file not found during startup!");
+            }
+
             server = HttpServer.create(new InetSocketAddress(port), 0);
             server.createContext("/resource_pack.zip", exchange -> {
-                File resourcePackFile = new File(plugin.getDataFolder(), plugin.getConfig().getString("resource-pack.file-name", "resource_pack.zip"));
                 if (!resourcePackFile.exists()) {
                     String response = "Resource pack not found.";
                     exchange.sendResponseHeaders(404, response.length());
-                    exchange.getResponseBody().write(response.getBytes());
-                    exchange.getResponseBody().close();
+                    try (OutputStream os = exchange.getResponseBody()) {
+                        os.write(response.getBytes());
+                    }
                     plugin.getLogger().severe("Resource pack not found at " + resourcePackFile.getAbsolutePath());
+                    return;
                 }
 
                 exchange.getResponseHeaders().set("Content-Type", "application/zip");
@@ -62,14 +74,16 @@ public class ResourcePackServer {
 
 
     /**
-     * Computes the SHA-1 hash of a file.
-     * By providing an SHA-1 hash in the setResourcePack method, Minecraft will check the hash of your local file against the one from the server.
-     * If they don't match, it triggers an automatic redownload.
-     *
-     * @param file The file to hash.
-     * @return The SHA-1 hash as a hexadecimal string.
+     * Retrieves the cached SHA-1 hash of the resource pack.
      */
-    public static byte[] getFileHash(File file) {
+    public byte[] getCachedHash() {
+        return cachedHash != null ? cachedHash : new byte[0];
+    }
+
+    /**
+     * Computes the SHA-1 hash of a file.
+     */
+    private byte[] calculateFileHash(File file) {
         try (InputStream is = Files.newInputStream(file.toPath())) {
             MessageDigest digest = MessageDigest.getInstance("SHA-1");
             byte[] buffer = new byte[8192];
@@ -77,8 +91,9 @@ public class ResourcePackServer {
             while ((read = is.read(buffer)) != -1) {
                 digest.update(buffer, 0, read);
             }
-            return digest.digest(); // Returns the 20-byte array
+            return digest.digest();
         } catch (Exception e) {
+            plugin.getLogger().severe("Failed to calculate resource pack hash: " + e.getMessage());
             return new byte[0];
         }
     }

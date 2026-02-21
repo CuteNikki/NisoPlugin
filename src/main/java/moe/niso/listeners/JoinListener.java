@@ -18,6 +18,11 @@ import java.io.File;
 
 public class JoinListener implements Listener {
     private final NisoPlugin plugin = NisoPlugin.getInstance();
+    private final ResourcePackServer packServer;
+
+    public JoinListener(ResourcePackServer packServer) {
+        this.packServer = packServer;
+    }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
@@ -27,11 +32,16 @@ public class JoinListener implements Listener {
         if (resourcePackEnabled) {
             String resourcePackFileName = plugin.getConfig().getString("resource-pack.file-name", "resource_pack.zip");
             int serverPort = plugin.getConfig().getInt("resource-pack.server-port", 8080);
-            String resourcePackURL = "http://" + plugin.getConfig().getString("resource-pack.server-ip", "localhost") + ":" + serverPort + "/" + resourcePackFileName;
+            String serverIp = plugin.getConfig().getString("resource-pack.server-ip", "localhost");
+
+            String resourcePackURL = "http://" + serverIp + ":" + serverPort + "/" + resourcePackFileName;
             boolean forceDownload = plugin.getConfig().getBoolean("resource-pack.force-download", false);
             String promptMessage = plugin.getConfig().getString("resource-pack.prompt-message", "<red>Resource Pack Download");
-            File resourcePackFile = new File(plugin.getDataFolder(), resourcePackFileName);
-            player.setResourcePack(resourcePackURL, ResourcePackServer.getFileHash(resourcePackFile), MiniMessage.miniMessage().deserialize(promptMessage), forceDownload);
+
+            // Use the cached hash instead of recalculating it
+            byte[] hash = packServer.getCachedHash();
+
+            player.setResourcePack(resourcePackURL, hash, MiniMessage.miniMessage().deserialize(promptMessage), forceDownload);
         }
 
         // If the joining player is vanished, hide them from other players

@@ -125,7 +125,7 @@ public final class NisoPlugin extends JavaPlugin {
     private void registerEvents() {
         PluginManager manager = getServer().getPluginManager();
 
-        manager.registerEvents(new JoinListener(), this);
+        manager.registerEvents(new JoinListener(packServer), this);
         manager.registerEvents(new LeaveListener(), this);
         manager.registerEvents(new ChatListener(), this);
         manager.registerEvents(new MotdListener(), this);
