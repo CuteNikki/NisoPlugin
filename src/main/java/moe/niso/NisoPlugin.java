@@ -1,8 +1,32 @@
 package moe.niso;
 
-import moe.niso.commands.*;
-import moe.niso.listeners.*;
-import moe.niso.managers.*;
+import java.util.Objects;
+import moe.niso.commands.EnderchestCommand;
+import moe.niso.commands.FeedCommand;
+import moe.niso.commands.FlyCommand;
+import moe.niso.commands.GodCommand;
+import moe.niso.commands.HealCommand;
+import moe.niso.commands.HomeCommand;
+import moe.niso.commands.InvseeCommand;
+import moe.niso.commands.RepairCommand;
+import moe.niso.commands.TeleportAcceptCommand;
+import moe.niso.commands.TeleportAskCommand;
+import moe.niso.commands.TeleportDenyCommand;
+import moe.niso.commands.TeleportListCommand;
+import moe.niso.commands.TrashCommand;
+import moe.niso.commands.VanishCommand;
+import moe.niso.commands.WarpCommand;
+import moe.niso.listeners.ChatListener;
+import moe.niso.listeners.InventoryListener;
+import moe.niso.listeners.JoinListener;
+import moe.niso.listeners.LeaveListener;
+import moe.niso.listeners.MotdListener;
+import moe.niso.managers.ConfigManager;
+import moe.niso.managers.DatabaseManager;
+import moe.niso.managers.HomeManager;
+import moe.niso.managers.TablistManager;
+import moe.niso.managers.VersionManager;
+import moe.niso.managers.WarpManager;
 import moe.niso.web.ResourcePackServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -12,9 +36,8 @@ import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Objects;
-
 public final class NisoPlugin extends JavaPlugin {
+
     private static NisoPlugin instance;
     public String logPrefixDatabase = "Database -> ";
     public String logPrefixManager = "Manager -> ";
@@ -143,7 +166,8 @@ public final class NisoPlugin extends JavaPlugin {
             Class.forName("org.postgresql.Driver");
             getLogger().info(logPrefixDatabase + "PostgreSQL Driver loaded successfully");
         } catch (ClassNotFoundException e) {
-            getLogger().severe(logPrefixDatabase + "PostgreSQL Driver not found: " + e.getMessage());
+            getLogger().severe(
+                logPrefixDatabase + "PostgreSQL Driver not found: " + e.getMessage());
             getLogger().severe(logPrefixDatabase + "Disabling plugin...");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
@@ -201,7 +225,8 @@ public final class NisoPlugin extends JavaPlugin {
             final int serverPort = getConfig().getInt("resource-pack.server-port", 8080);
             packServer = new ResourcePackServer();
             packServer.start(serverPort);
-            getLogger().info(logPrefixManager + "Resource Pack Server started on port " + serverPort);
+            getLogger().info(
+                logPrefixManager + "Resource Pack Server started on port " + serverPort);
         }
     }
 
@@ -221,10 +246,12 @@ public final class NisoPlugin extends JavaPlugin {
     private void updateCheck() {
         final String currentVersion = VersionManager.getCurrentVersion();
         final String newestVersion = VersionManager.getNewestVersion();
-        final boolean updateAvailable = VersionManager.isNewerVersion(currentVersion, newestVersion);
+        final boolean updateAvailable = VersionManager.isNewerVersion(currentVersion,
+            newestVersion);
 
         if (updateAvailable) {
-            getLogger().info(logPrefixUpdater + "New version available! (Latest: " + newestVersion + ", Current: " + currentVersion + ")");
+            getLogger().info(logPrefixUpdater + "New version available! (Latest: " + newestVersion
+                + ", Current: " + currentVersion + ")");
 
             final boolean autoUpdate = getConfig().getBoolean("auto-update");
 
@@ -232,31 +259,37 @@ public final class NisoPlugin extends JavaPlugin {
                 getLogger().info(logPrefixUpdater + "Starting automatic download...");
 
                 if (VersionManager.downloadUpdate()) {
-                    getLogger().info(logPrefixUpdater + "Download successful! Restart the server to apply changes.");
+                    getLogger().info(logPrefixUpdater
+                        + "Download successful! Restart the server to apply changes.");
                 } else {
-                    getLogger().warning(logPrefixUpdater + "Download failed! Check the console for errors.");
+                    getLogger().warning(
+                        logPrefixUpdater + "Download failed! Check the console for errors.");
                 }
 
             } else {
                 // Update is available but auto-update is disabled
-                getLogger().info(logPrefixUpdater + "Download the update at: " + VersionManager.getDownloadURL());
+                getLogger().info(logPrefixUpdater + "Download the update at: "
+                    + VersionManager.getDownloadURL());
             }
 
         } else {
             // No update available
-            getLogger().info(logPrefixUpdater + "Plugin is up to date! (Latest: " + newestVersion + ", Current: " + currentVersion + ")");
+            getLogger().info(
+                logPrefixUpdater + "Plugin is up to date! (Latest: " + newestVersion + ", Current: "
+                    + currentVersion + ")");
         }
     }
 
     /**
-     * Get a command by name and throw an exception if it's not found.
-     * Utility method so I don't have to write Object.requireNonNull() every time.
+     * Get a command by name and throw an exception if it's not found. Utility method so I don't
+     * have to write Object.requireNonNull() every time.
      *
      * @param name Command name
      * @return PluginCommand instance
      */
     private PluginCommand getCmd(String name) {
-        return Objects.requireNonNull(getCommand(name), "Command '" + name + "' is not registered in plugin.yml");
+        return Objects.requireNonNull(getCommand(name),
+            "Command '" + name + "' is not registered in plugin.yml");
     }
 
     /**
@@ -284,6 +317,8 @@ public final class NisoPlugin extends JavaPlugin {
      * @return Prefixed component
      */
     public Component prefixMessage(Component component) {
-        return MiniMessage.miniMessage().deserialize(Objects.requireNonNull(getConfig().getString("message-prefix"))).append(component);
+        return MiniMessage.miniMessage()
+            .deserialize(Objects.requireNonNull(getConfig().getString("message-prefix")))
+            .append(component);
     }
 }

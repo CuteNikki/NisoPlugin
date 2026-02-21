@@ -1,8 +1,6 @@
 package moe.niso.web;
 
 import com.sun.net.httpserver.HttpServer;
-import moe.niso.NisoPlugin;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -10,19 +8,23 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.security.MessageDigest;
+import moe.niso.NisoPlugin;
 
 public class ResourcePackServer {
+
     private final NisoPlugin plugin = NisoPlugin.getInstance();
     private HttpServer server;
     private byte[] cachedHash;
 
     /**
      * Starts the HTTP server on the specified port.
+     *
      * @param port The port number to start the server on.
      */
     public void start(int port) {
         try {
-            String fileName = plugin.getConfig().getString("resource-pack.file-name", "resource_pack.zip");
+            String fileName = plugin.getConfig()
+                .getString("resource-pack.file-name", "resource_pack.zip");
             File resourcePackFile = new File(plugin.getDataFolder(), fileName);
 
             if (resourcePackFile.exists()) {
@@ -40,16 +42,19 @@ public class ResourcePackServer {
                     try (OutputStream os = exchange.getResponseBody()) {
                         os.write(response.getBytes());
                     }
-                    plugin.getLogger().severe("Resource pack not found at " + resourcePackFile.getAbsolutePath());
+                    plugin.getLogger()
+                        .severe("Resource pack not found at " + resourcePackFile.getAbsolutePath());
                     return;
                 }
 
                 exchange.getResponseHeaders().set("Content-Type", "application/zip");
-                exchange.getResponseHeaders().set("Content-Disposition", "attachment; filename=\"resource_pack.zip\"");
+                exchange.getResponseHeaders()
+                    .set("Content-Disposition", "attachment; filename=\"resource_pack.zip\"");
                 exchange.getResponseHeaders().set("Cache-Control", "public, max-age=3600");
 
                 exchange.sendResponseHeaders(200, resourcePackFile.length());
-                try (OutputStream outputStream = exchange.getResponseBody(); FileInputStream fileInputStream = new FileInputStream(resourcePackFile)) {
+                try (OutputStream outputStream = exchange.getResponseBody(); FileInputStream fileInputStream = new FileInputStream(
+                    resourcePackFile)) {
                     fileInputStream.transferTo(outputStream);
                 }
                 exchange.close();
