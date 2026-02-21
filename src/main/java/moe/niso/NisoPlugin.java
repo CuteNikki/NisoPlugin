@@ -158,7 +158,7 @@ public final class NisoPlugin extends JavaPlugin {
     }
 
     /**
-     * Initialise the database connection and create tables if they don't exist.
+     * Initialize the database connection and create tables if they don't exist.
      */
     private void initialiseDatabase() {
         // Check if the PostgreSQL driver is loaded and disable the plugin if it's not found
@@ -217,7 +217,7 @@ public final class NisoPlugin extends JavaPlugin {
     }
 
     /**
-     * Initialise the resource pack server if enabled in the config.
+     * Initialize the resource pack server if enabled in the config.
      */
     private void initialiseResourcePackServer() {
         final boolean resourcePackEnabled = getConfig().getBoolean("resource-pack.enabled");
