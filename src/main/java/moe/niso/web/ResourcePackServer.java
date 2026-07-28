@@ -35,7 +35,7 @@ public class ResourcePackServer {
             }
 
             server = HttpServer.create(new InetSocketAddress(port), 0);
-            server.createContext("/" + fileName, exchange -> {
+            server.createContext("/resource_pack.zip", exchange -> {
                 if (!resourcePackFile.exists()) {
                     String response = "Resource pack not found.";
                     exchange.sendResponseHeaders(404, response.length());

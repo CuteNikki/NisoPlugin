@@ -31,13 +31,11 @@ public class JoinListener implements Listener {
 
         boolean resourcePackEnabled = plugin.getConfig().getBoolean("resource-pack.enabled");
         if (resourcePackEnabled) {
-            String resourcePackFileName = plugin.getConfig()
-                    .getString("resource-pack.file-name", "resource_pack.zip");
             int serverPort = plugin.getConfig().getInt("resource-pack.server-port", 8080);
             String serverIp = plugin.getConfig().getString("resource-pack.server-ip", "localhost");
 
             String resourcePackURL =
-                    "http://" + serverIp + ":" + serverPort + "/" + resourcePackFileName;
+                    "http://" + serverIp + ":" + serverPort + "/resource_pack.zip";
             boolean forceDownload = plugin.getConfig()
                     .getBoolean("resource-pack.force-download", false);
             String promptMessage = plugin.getConfig()
