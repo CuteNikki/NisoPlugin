@@ -3,8 +3,7 @@
 NisoPlugin is a PaperMC plugin for Minecraft 1.21.4 that provides various features to enhance your server experience.
 
 This plugin includes functionalities such as warps and homes stored in a PostgreSQL Database, customizable server MOTD,
-join/leave messages, and chat
-formatting.
+join/leave messages, and chat formatting.
 
 ## Table of Contents
 
@@ -39,7 +38,8 @@ formatting.
 - **Repair**: Repair the item in your hand.
 - **Trash**: Open a trash bin to delete items.
 - **Enderchest**: Open an ender chest.
-- **Invsee**: View the inventory of other players.
+- **Workbench**: Open a virtual crafting table anytime.
+- **Invsee**: View and manage the inventory of other players (including armor and offhand slots).
 - **Feed**: Takes care of hunger for a while.
 - **Heal**: Heal yourself.
 - **God Mode**: Toggle god mode for yourself.
@@ -103,7 +103,7 @@ tablist:
   # keep this value between 20 and 1000 ticks to prevent issues
   update-interval: 100
   header: |-
-    <dark_gray>  <strikethrough> ]                                                                  [ <reset>  <dark_gray>
+    <dark_gray>  <strikethrough> ]                                                 [ <reset>  <dark_gray>
     <gray>
     <gradient:#FF5CCC:#743296>mc.niso.moe
     <gray>
@@ -112,7 +112,7 @@ tablist:
     <gray>TPS: <green>%server_tps_15% <dark_gray>| <gray>Your Ping: <green>%player_ping%ms
     <gray>Players: <green>%server_online%<dark_gray>/<green>%server_max_players% <dark_gray>| <gray>Uptime: <green>%server_uptime%
     <gray>
-    <dark_gray>  <strikethrough> ]                                                                  [ <reset>  <dark_gray>
+    <dark_gray>  <strikethrough> ]                                                 [ <reset>  <dark_gray>
 
 # Welcome Message Configuration
 welcome-message:
@@ -162,223 +162,221 @@ database:
   username: username
   password: super_secret
   pool-size: 10
+
 ```
 
 ## Images
 
 Message Prefix:
 
-![message-prefix.png](assets/message-prefix.png)
-
 Join/Leave Messages:
-
-![join-message.png](assets/join-message.png)
 
 Chat Format:
 
-![chat-format.png](assets/chat-format.png)
-
 Server MOTD:
-
-![motd.png](assets/motd.png)
 
 Tablist:
 
-![tablist.png](assets/tablist.png)
-
 Autocomplete:
-
-![autocomplete.png](assets/autocomplete.png)
 
 ## Commands
 
 #### Fly
 
-- **/fly**: Toggle flight mode on or off.
-- **/fly Player**: Toggle flight mode on or off for a target player.
+* **/fly**: Toggle flight mode on or off.
+* **/fly Player**: Toggle flight mode on or off for a target player.
 
 #### Vanish
 
-- **/vanish**: Toggle vanish mode on or off.
-- **/vanish Player**: Toggle vanish mode on or off for a target player.
+* **/vanish**: Toggle vanish mode on or off.
+* **/vanish Player**: Toggle vanish mode on or off for a target player.
 
 #### Repair
 
-- **/repair**: Repair the item in your hand.
-- **/repair Player**: Repair a target player's item.
+* **/repair**: Repair the item in your hand.
+* **/repair Player**: Repair a target player's item.
 
 #### Trash
 
-- **/trash**: Open a trash bin to delete items.
+* **/trash**: Open a trash bin to delete items.
 
 #### Enderchest
 
-- **/enderchest**: Open your ender chest.
-- **/enderchest Player**: Open a target player's ender chest.
+* **/enderchest**: Open your ender chest.
+* **/enderchest Player**: Open a target player's ender chest.
+
+#### Workbench
+
+* **/workbench**: Open a virtual crafting table menu.
 
 #### Invsee
 
-- **/invsee Player**: View the inventory of a target player.
+* **/invsee Player**: View and interact with the inventory of a target player.
 
 #### Feed
 
-- **/feed**: Feed yourself.
-- **/feed Player**: Feed a target player.
+* **/feed**: Feed yourself.
+* **/feed Player**: Feed a target player.
 
 #### Heal
 
-- **/heal**: Heal yourself.
-- **/heal Player**: Heal a target player.
+* **/heal**: Heal yourself.
+* **/heal Player**: Heal a target player.
 
 #### God
 
-- **/god**: Toggle god mode on or off.
-- **/god Player**: Toggle god mode on or off for a target player.
+* **/god**: Toggle god mode on or off.
+* **/god Player**: Toggle god mode on or off for a target player.
 
 #### Warps
 
-- **/warp set Name**: Set a warp point at your current location.
-- **/warp delete Name**: Remove a warp point.
-- **/warp tp Name**: Teleport to a warp point.
-- **/warp list**: List all warp points.
+* **/warp set Name**: Set a warp point at your current location.
+* **/warp delete Name**: Remove a warp point.
+* **/warp tp Name**: Teleport to a warp point.
+* **/warp list**: List all warp points.
 
 #### Homes
 
-- **/home set Name**: Set your home location.
-- **/home delete Name**: Remove your home location.
-- **/home tp Name**: Teleport to your home location.
-- **/home list**: List all home locations.
+* **/home set Name**: Set your home location.
+* **/home delete Name**: Remove your home location.
+* **/home tp Name**: Teleport to your home location.
+* **/home list**: List all home locations.
 
 #### Teleport Asks
 
-- **/tpask Player**: Ask a target player for teleportation.
-- **/tpaccept Player**: Accept a teleportation request from a Player.
-- **/tpdeny Player**: Deny a teleportation request from a Player.
-- **/tplist**: List all teleportation requests.
+* **/tpask Player**: Ask a target player for teleportation.
+* **/tpaccept Player**: Accept a teleportation request from a Player.
+* **/tpdeny Player**: Deny a teleportation request from a Player.
+* **/tplist**: List all teleportation requests.
 
 ## Permissions
 
 #### Fly
 
-- **niso.fly.use**: Allows players to use the fly command.
-- **niso.fly.others**: Allows the player to toggle flight on a target player.
-- **niso.fly.bypass**: Other players cannot toggle flight for the player.
+* **niso.fly.use**: Allows players to use the fly command.
+* **niso.fly.others**: Allows the player to toggle flight on a target player.
+* **niso.fly.bypass**: Other players cannot toggle flight for the player.
 
 #### Vanish
 
-- **niso.vanish.use**: Allows players to use the vanish command.
-- **niso.vanish.others**: Allows the player to toggle vanish on a target player.
-- **niso.vanish.bypass**: Other players cannot toggle vanish for the player.
-- **niso.vanish.see**: Allows the player to see vanished players.
+* **niso.vanish.use**: Allows players to use the vanish command.
+* **niso.vanish.others**: Allows the player to toggle vanish on a target player.
+* **niso.vanish.bypass**: Other players cannot toggle vanish for the player.
+* **niso.vanish.see**: Allows the player to see vanished players.
 
 #### Repair
 
-- **niso.repair.use**: Allows players to use the repair command.
-- **niso.repair.others**: Allows the player to repair a target player's item.
+* **niso.repair.use**: Allows players to use the repair command.
+* **niso.repair.others**: Allows the player to repair a target player's item.
 
 #### Trash
 
-- **niso.trash.use**: Allows players to use the trash command.
+* **niso.trash.use**: Allows players to use the trash command.
 
 #### Enderchest
 
-- **niso.enderchest.use**: Allows players to use the enderchest command.
-- **niso.enderchest.others**: Allows the player to open other player's ender chest.
-- **niso.enderchest.bypass**: Other players cannot open the player's ender chest.
+* **niso.enderchest.use**: Allows players to use the enderchest command.
+* **niso.enderchest.others**: Allows the player to open other player's ender chest.
+* **niso.enderchest.bypass**: Other players cannot open the player's ender chest.
+
+#### Workbench
+
+* **niso.workbench.use**: Allows players to open a virtual crafting table with `/workbench`.
 
 #### Invsee
 
-- **niso.invsee.use**: Allows players to use the invsee command.
-- **niso.invsee.bypass**: Other players cannot open the player's inventory.
+* **niso.invsee.use**: Allows players to use the invsee command.
+* **niso.invsee.bypass**: Other players cannot open the player's inventory.
 
 #### Feed
 
-- **niso.feed.use**: Allows players to use the feed command.
-- **niso.feed.others**: Allows the player to feed a target player.
+* **niso.feed.use**: Allows players to use the feed command.
+* **niso.feed.others**: Allows the player to feed a target player.
 
 #### Heal
 
-- **niso.heal.use**: Allows players to use the heal command.
-- **niso.heal.others**: Allows the player to heal a target player.
+* **niso.heal.use**: Allows players to use the heal command.
+* **niso.heal.others**: Allows the player to heal a target player.
 
 #### God
 
-- **niso.god.use**: Allows players to use the god command.
-- **niso.god.others**: Allows the player to toggle god mode on a target player.
-- **niso.god.bypass**: Other players cannot toggle god mode for the player.
+* **niso.god.use**: Allows players to use the god command.
+* **niso.god.others**: Allows the player to toggle god mode on a target player.
+* **niso.god.bypass**: Other players cannot toggle god mode for the player.
 
 #### Warps
 
-- **niso.warp.use**: Allows players to use warp commands.
-- **niso.warp.set**: Allows players to set warp points.
-- **niso.warp.delete**: Allows players to remove warp points.
-- **niso.warp.teleport**: Allows players to teleport to warp points.
-- **niso.warp.list**: Allows players to list warp points.
+* **niso.warp.use**: Allows players to use warp commands.
+* **niso.warp.set**: Allows players to set warp points.
+* **niso.warp.delete**: Allows players to remove warp points.
+* **niso.warp.teleport**: Allows players to teleport to warp points.
+* **niso.warp.list**: Allows players to list warp points.
 
 #### Homes
 
-- **niso.home.use**: Allows players to use home commands.
-- **niso.home.set**: Allows players to set home locations.
-- **niso.home.delete**: Allows players to remove home locations.
-- **niso.home.teleport**: Allows players to teleport to home locations.
-- **niso.home.list**: Allows players to list home locations.
-- **niso.home.limit-(number)**: Allows players to set a specific number (up to 50) of home locations (`niso.home.limit-3` for a max of 3 homes).
+* **niso.home.use**: Allows players to use home commands.
+* **niso.home.set**: Allows players to set home locations.
+* **niso.home.delete**: Allows players to remove home locations.
+* **niso.home.teleport**: Allows players to teleport to home locations.
+* **niso.home.list**: Allows players to list home locations.
+* **niso.home.limit-(number)**: Allows players to set a specific number (up to 50) of home locations (`niso.home.limit-3` for a max of 3 homes).
 
 #### Teleport Asks
 
-- **niso.tpask.use**: Allows players to ask for teleportation to other players.
-- **niso.tpaccept.use**: Allows players to accept teleportation requests.
-- **niso.tpdeny.use**: Allows players to deny teleportation requests.
-- **niso.tplist.use**: Allows players to list teleportation requests.
+* **niso.tpask.use**: Allows players to ask for teleportation to other players.
+* **niso.tpaccept.use**: Allows players to accept teleportation requests.
+* **niso.tpdeny.use**: Allows players to deny teleportation requests.
+* **niso.tplist.use**: Allows players to list teleportation requests.
 
 ## Permission Group Examples:
 
 #### Admin (Inherits from Moderator):
 
-- niso.heal.others
-- niso.feed.others
-- niso.repair.others
-- niso.fly.bypass
-- niso.fly.others
-- niso.god.bypass
-- niso.god.others
-- niso.enderchest.bypass
-- niso.enderchest.others
-- niso.invsee.use
-- niso.invsee.bypass
-- niso.vanish.bypass
-- niso.home.limit-50
+* niso.heal.others
+* niso.feed.others
+* niso.repair.others
+* niso.fly.bypass
+* niso.fly.others
+* niso.god.bypass
+* niso.god.others
+* niso.enderchest.bypass
+* niso.enderchest.others
+* niso.invsee.use
+* niso.invsee.bypass
+* niso.vanish.bypass
+* niso.home.limit-50
 
 #### Moderator (Inherits from Player):
 
-- niso.feed.use
-- niso.heal.use
-- niso.fly.use
-- niso.god.use
-- niso.repair.use
-- niso.warp.set
-- niso.warp.delete
-- niso.vanish.use
-- niso.vanish.see
-- niso.home.limit-10
+* niso.feed.use
+* niso.heal.use
+* niso.fly.use
+* niso.god.use
+* niso.repair.use
+* niso.warp.set
+* niso.warp.delete
+* niso.vanish.use
+* niso.vanish.see
+* niso.home.limit-10
 
 #### Player:
 
-- niso.trash.use
-- niso.warp.use
-- niso.warp.list
-- niso.warp.teleport
-- niso.enderchest.use
-- niso.home.use
-- niso.home.list
-- niso.home.set
-- niso.home.teleport
-- niso.home.delete
-- niso.home.limit-3
-- niso.tpask.use
-- niso.tpaccept.use
-- niso.tpdeny.use
-- niso.tplist.use
+* niso.trash.use
+* niso.warp.use
+* niso.warp.list
+* niso.warp.teleport
+* niso.enderchest.use
+* niso.workbench.use
+* niso.home.use
+* niso.home.list
+* niso.home.set
+* niso.home.teleport
+* niso.home.delete
+* niso.home.limit-3
+* niso.tpask.use
+* niso.tpaccept.use
+* niso.tpdeny.use
+* niso.tplist.use
 
 ## Support
 
@@ -387,4 +385,6 @@ the [GitHub repository](https://github.com/CuteNikki/NisoPlugin/).
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](https://www.google.com/search?q=LICENSE) file for details.
+
+```
