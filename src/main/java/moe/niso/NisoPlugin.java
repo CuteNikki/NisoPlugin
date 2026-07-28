@@ -16,11 +16,7 @@ import moe.niso.commands.TeleportListCommand;
 import moe.niso.commands.TrashCommand;
 import moe.niso.commands.VanishCommand;
 import moe.niso.commands.WarpCommand;
-import moe.niso.listeners.ChatListener;
-import moe.niso.listeners.InventoryListener;
-import moe.niso.listeners.JoinListener;
-import moe.niso.listeners.LeaveListener;
-import moe.niso.listeners.MotdListener;
+import moe.niso.listeners.*;
 import moe.niso.managers.ConfigManager;
 import moe.niso.managers.DatabaseManager;
 import moe.niso.managers.HomeManager;
@@ -153,6 +149,7 @@ public final class NisoPlugin extends JavaPlugin {
         manager.registerEvents(new ChatListener(), this);
         manager.registerEvents(new MotdListener(), this);
         manager.registerEvents(new InventoryListener(), this);
+        manager.registerEvents(new InvseeListener(), this);
 
         getLogger().info(logPrefixManager + "Events registered!");
     }
