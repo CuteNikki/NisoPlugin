@@ -35,9 +35,7 @@ public class InvseeListener implements Listener {
         }
 
         // Schedule sync right after the event resolves so Bukkit updates slot contents first
-        NisoPlugin.getInstance().getServer().getScheduler().runTask(NisoPlugin.getInstance(), () -> {
-            syncGuiToTarget(event.getInventory(), target);
-        });
+        NisoPlugin.getInstance().getServer().getScheduler().runTask(NisoPlugin.getInstance(), () -> syncGuiToTarget(event.getInventory(), target));
     }
 
     @EventHandler
@@ -60,9 +58,7 @@ public class InvseeListener implements Listener {
             }
         }
 
-        NisoPlugin.getInstance().getServer().getScheduler().runTask(NisoPlugin.getInstance(), () -> {
-            syncGuiToTarget(event.getInventory(), target);
-        });
+        NisoPlugin.getInstance().getServer().getScheduler().runTask(NisoPlugin.getInstance(), () -> syncGuiToTarget(event.getInventory(), target));
     }
 
     private void syncGuiToTarget(Inventory gui, Player target) {
