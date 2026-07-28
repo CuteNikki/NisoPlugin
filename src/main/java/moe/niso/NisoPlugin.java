@@ -1,21 +1,8 @@
 package moe.niso;
 
 import java.util.Objects;
-import moe.niso.commands.EnderchestCommand;
-import moe.niso.commands.FeedCommand;
-import moe.niso.commands.FlyCommand;
-import moe.niso.commands.GodCommand;
-import moe.niso.commands.HealCommand;
-import moe.niso.commands.HomeCommand;
-import moe.niso.commands.InvseeCommand;
-import moe.niso.commands.RepairCommand;
-import moe.niso.commands.TeleportAcceptCommand;
-import moe.niso.commands.TeleportAskCommand;
-import moe.niso.commands.TeleportDenyCommand;
-import moe.niso.commands.TeleportListCommand;
-import moe.niso.commands.TrashCommand;
-import moe.niso.commands.VanishCommand;
-import moe.niso.commands.WarpCommand;
+
+import moe.niso.commands.*;
 import moe.niso.listeners.*;
 import moe.niso.managers.ConfigManager;
 import moe.niso.managers.DatabaseManager;
@@ -134,6 +121,7 @@ public final class NisoPlugin extends JavaPlugin {
         getCmd("tpaccept").setExecutor(new TeleportAcceptCommand());
         getCmd("tpdeny").setExecutor(new TeleportDenyCommand());
         getCmd("tplist").setExecutor(new TeleportListCommand());
+        getCmd("workbench").setExecutor(new WorkbenchCommand());
 
         getLogger().info(logPrefixManager + "Commands registered!");
     }

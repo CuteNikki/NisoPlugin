@@ -81,3 +81,7 @@ commands:
     usage: /tplist
     aliases: [ teleportlist, teleportrequestlist ]
     permission: niso.tplist.use
+  workbench:
+    description: Opens a virtual crafting table
+    aliases: [ wb, craft ]
+    permission: niso.workbench.use
