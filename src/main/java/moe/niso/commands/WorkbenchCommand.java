@@ -16,6 +16,7 @@ import java.util.List;
 public class WorkbenchCommand implements TabExecutor {
     private final NisoPlugin plugin = NisoPlugin.getInstance();
 
+    @SuppressWarnings("UnstableApiUsage")
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
         if (!(sender instanceof Player player)) {
