@@ -4,12 +4,7 @@ import java.util.Objects;
 
 import moe.niso.commands.*;
 import moe.niso.listeners.*;
-import moe.niso.managers.ConfigManager;
-import moe.niso.managers.DatabaseManager;
-import moe.niso.managers.HomeManager;
-import moe.niso.managers.TablistManager;
-import moe.niso.managers.VersionManager;
-import moe.niso.managers.WarpManager;
+import moe.niso.managers.*;
 import moe.niso.web.ResourcePackServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -29,6 +24,7 @@ public final class NisoPlugin extends JavaPlugin {
     private TablistManager tablistManager;
     private LuckPerms luckPerms;
     private ResourcePackServer packServer;
+    private VanishManager vanishManager;
 
     /**
      * Get the plugin instance.
@@ -73,6 +69,10 @@ public final class NisoPlugin extends JavaPlugin {
 
         // Start the tablist manager
         tablistManager = new TablistManager();
+        // Start the vanish manager
+        vanishManager = new VanishManager(this);
+        // Load vanished players from config
+        vanishManager.loadVanishedPlayers();
 
         // Start cache cleanup
         HomeManager.startHomeCacheCleanup();
@@ -95,6 +95,11 @@ public final class NisoPlugin extends JavaPlugin {
         // Stop the tablist manager
         if (tablistManager != null) {
             tablistManager.stop();
+        }
+
+        // Save vanished players to config
+        if (vanishManager != null) {
+            vanishManager.saveVanishedPlayers();
         }
 
         stopResourcePackServer();
@@ -138,6 +143,7 @@ public final class NisoPlugin extends JavaPlugin {
         manager.registerEvents(new MotdListener(), this);
         manager.registerEvents(new InventoryListener(), this);
         manager.registerEvents(new InvseeListener(), this);
+        manager.registerEvents(new VanishListener(), this);
 
         getLogger().info(logPrefixManager + "Events registered!");
     }
@@ -293,6 +299,15 @@ public final class NisoPlugin extends JavaPlugin {
      */
     public LuckPerms getLuckPerms() {
         return luckPerms;
+    }
+
+    /**
+     * Get the vanish manager instance.
+     *
+     * @return VanishManager instance
+     */
+    public VanishManager getVanishManager() {
+        return vanishManager;
     }
 
     /**

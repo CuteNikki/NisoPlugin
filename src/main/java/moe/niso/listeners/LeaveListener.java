@@ -2,6 +2,7 @@ package moe.niso.listeners;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import moe.niso.NisoPlugin;
+import moe.niso.managers.VanishManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.configuration.ConfigurationSection;
@@ -16,9 +17,15 @@ public class LeaveListener implements Listener {
     @EventHandler
     public void onLeave(PlayerQuitEvent event) {
         final Player player = event.getPlayer();
+        final VanishManager vanishManager = plugin.getVanishManager();
 
-        // Sending leave messages
+        // Suppress quit message if the player is vanished
+        if (vanishManager.isVanished(player.getUniqueId())) {
+            event.quitMessage(null);
+            return;
+        }
 
+        // 2. Sending normal leave messages
         final ConfigurationSection leaveConfig = plugin.getConfig().getConfigurationSection("leave-message");
 
         if (leaveConfig == null || !leaveConfig.getBoolean("enabled")) {

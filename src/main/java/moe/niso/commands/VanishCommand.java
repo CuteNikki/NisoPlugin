@@ -3,12 +3,10 @@ package moe.niso.commands;
 import moe.niso.NisoPlugin;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,57 +49,30 @@ public class VanishCommand implements TabExecutor {
             return true;
         }
 
-        toggleVanish(player, null);
+        toggleVanish(player, player);
         return true;
     }
 
-    private void toggleVanish(Player player, Player targetPlayer) {
-        if (targetPlayer != null) {
-            if (targetPlayer.hasMetadata("vanished")) {
-                targetPlayer.removeMetadata("vanished", plugin);
+    private void toggleVanish(Player executor, Player target) {
+        boolean isSelf = executor.equals(target);
+        boolean nowVanished = plugin.getVanishManager().toggleVanish(target);
 
-                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                    onlinePlayer.showPlayer(plugin, targetPlayer);
-                }
-
-                player.sendMessage(plugin.prefixMessage(Component.text("Vanish mode disabled for " + targetPlayer.getName()).color(NamedTextColor.GREEN)));
-                targetPlayer.sendMessage(plugin.prefixMessage(Component.text("You are now visible!").color(NamedTextColor.GREEN)));
-            } else {
-                targetPlayer.setMetadata("vanished", new FixedMetadataValue(plugin, true));
-
-                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                    if (!onlinePlayer.hasPermission("niso.vanish.see")) {
-                        onlinePlayer.hidePlayer(plugin, targetPlayer);
-                    }
-                }
-
-                player.sendMessage(plugin.prefixMessage(Component.text("Vanish mode enabled for " + targetPlayer.getName()).color(NamedTextColor.RED)));
-                targetPlayer.sendMessage(plugin.prefixMessage(Component.text("You are now invisible!").color(NamedTextColor.GREEN)));
+        if (nowVanished) {
+            if (!isSelf) {
+                executor.sendMessage(plugin.prefixMessage(Component.text("Vanish mode enabled for " + target.getName()).color(NamedTextColor.GREEN)));
             }
+            target.sendMessage(plugin.prefixMessage(Component.text("You are now invisible!").color(NamedTextColor.GREEN)));
         } else {
-            if (player.hasMetadata("vanished")) {
-                player.removeMetadata("vanished", plugin);
-
-                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                    onlinePlayer.showPlayer(plugin, player);
-                }
-
-                player.sendMessage(plugin.prefixMessage(Component.text("You are now visible!").color(NamedTextColor.GREEN)));
-            } else {
-                player.setMetadata("vanished", new FixedMetadataValue(plugin, true));
-
-                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                    onlinePlayer.hidePlayer(plugin, player);
-                }
-
-                player.sendMessage(plugin.prefixMessage(Component.text("You are now invisible!").color(NamedTextColor.GREEN)));
+            if (!isSelf) {
+                executor.sendMessage(plugin.prefixMessage(Component.text("Vanish mode disabled for " + target.getName()).color(NamedTextColor.RED)));
             }
+            target.sendMessage(plugin.prefixMessage(Component.text("You are now visible!").color(NamedTextColor.GREEN)));
         }
     }
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
-        if (args.length == 1) {
+        if (args.length == 1 && sender.hasPermission("niso.vanish.others")) {
             return plugin.getServer().getOnlinePlayers().stream()
                     .map(Player::getName)
                     .filter(name -> name.toLowerCase().startsWith(args[0].toLowerCase()))
