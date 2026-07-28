@@ -6,6 +6,8 @@ import moe.niso.managers.TablistManager;
 import moe.niso.managers.VanishManager;
 import moe.niso.managers.VersionManager;
 import moe.niso.web.ResourcePackServer;
+import net.kyori.adventure.resource.ResourcePackInfo;
+import net.kyori.adventure.resource.ResourcePackRequest;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -14,6 +16,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+
+import java.net.URI;
+import java.util.HexFormat;
+import java.util.UUID;
 
 public class JoinListener implements Listener {
 
@@ -33,18 +39,49 @@ public class JoinListener implements Listener {
         if (resourcePackEnabled) {
             int serverPort = plugin.getConfig().getInt("resource-pack.server-port", 8080);
             String serverIp = plugin.getConfig().getString("resource-pack.server-ip", "localhost");
+            String fileName = plugin.getConfig().getString("resource-pack.file-name", "resource_pack.zip")
+                    .trim().replaceAll("^/+", "");
 
-            String resourcePackURL =
-                    "http://" + serverIp + ":" + serverPort + "/resource_pack.zip";
-            boolean forceDownload = plugin.getConfig()
-                    .getBoolean("resource-pack.force-download", false);
-            String promptMessage = plugin.getConfig()
-                    .getString("resource-pack.prompt-message", "<red>Resource Pack Download");
+            String resourcePackURL = "http://" + serverIp + ":" + serverPort + "/" + fileName;
+            boolean forceDownload = plugin.getConfig().getBoolean("resource-pack.force-download", false);
+            String promptMessage = plugin.getConfig().getString("resource-pack.prompt-message", "<red>Resource Pack Download");
 
-            byte[] hash = packServer.getCachedHash();
+            if (!player.isOnline()) return;
 
-            player.setResourcePack(resourcePackURL, hash,
-                    MiniMessage.miniMessage().deserialize(promptMessage), forceDownload);
+            try {
+                URI packUri = URI.create(resourcePackURL);
+                byte[] rawHash = packServer.getCachedHash();
+
+                // Generate pack UUID from file hash (or URL fallback)
+                UUID packId = (rawHash != null && rawHash.length == 20)
+                        ? UUID.nameUUIDFromBytes(rawHash)
+                        : UUID.nameUUIDFromBytes(resourcePackURL.getBytes());
+
+                ResourcePackInfo.Builder packInfoBuilder = ResourcePackInfo.resourcePackInfo()
+                        .id(packId)
+                        .uri(packUri);
+
+                if (rawHash != null && rawHash.length == 20) {
+                    String hexHash = HexFormat.of().formatHex(rawHash);
+                    packInfoBuilder.hash(hexHash);
+                }
+
+                ResourcePackInfo packInfo = packInfoBuilder.build();
+
+                ResourcePackRequest request = ResourcePackRequest.resourcePackRequest()
+                        .packs(packInfo)
+                        .prompt(MiniMessage.miniMessage().deserialize(promptMessage))
+                        .required(forceDownload)
+                        .build();
+
+                player.sendResourcePacks(request);
+
+            } catch (Exception e) {
+                plugin.getLogger().severe("Failed to send resource pack request to " + player.getName() + ": " + e.getMessage());
+                if (plugin.getConfig().getBoolean("debug", false)) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         // Sending welcome messages
