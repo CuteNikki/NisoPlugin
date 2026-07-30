@@ -1,6 +1,6 @@
 # NisoPlugin
 
-NisoPlugin is a PaperMC plugin for Minecraft 1.21.4 that provides various features to enhance your server experience.
+NisoPlugin is a PaperMC plugin for Minecraft 26.2 that provides various features to enhance your server experience.
 
 This plugin includes functionalities such as warps and homes stored in a PostgreSQL Database, customizable server MOTD,
 join/leave messages, and chat formatting.
