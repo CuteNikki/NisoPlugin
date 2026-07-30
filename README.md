@@ -53,7 +53,7 @@ join/leave messages, and chat formatting.
 
 ## Requirements
 
-- **[PaperMC](https://papermc.io/)**: version 1.21!
+- **[PaperMC](https://papermc.io/)**: version 26.2!
 - **[PostgreSQL Database](https://www.postgresql.org/)**: to store warps and homes.
 - **[PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/)**: for placeholders in various places.
 
