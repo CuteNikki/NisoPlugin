@@ -66,6 +66,11 @@ commands:
     usage: /tpa <player>
     aliases: [ tpa, tpr, teleportask, teleportrequest ]
     permission: niso.tpask.use
+  tpaskhere:
+    description: Ask another player to teleport to you
+    usage: /tpahere <player>
+    aliases: [ tpah, tprhere, teleportaskhere, teleportrequesthere ]
+    permission: niso.tpaskhere.use
   tpaccept:
     description: Accept a teleport request
     usage: /tpaccept

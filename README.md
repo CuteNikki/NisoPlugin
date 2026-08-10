@@ -11,20 +11,22 @@ join/leave messages, and chat formatting.
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Configuration](#configuration)
-  - [PostgreSQL Database](#postgresql-database)
-  - [Customizable Messages](#customizable-messages)
-  - [Default Configuration](#default-configuration)
+    - [PostgreSQL Database](#postgresql-database)
+    - [Customizable Messages](#customizable-messages)
+    - [Default Configuration](#default-configuration)
 - [Images](#images)
 - [Commands](#commands)
-  - [Warps](#warps)
-  - [Homes](#homes)
+    - [Warps](#warps)
+    - [Homes](#homes)
+    - [Teleport Asks](#teleport-asks)
 - [Permissions](#permissions)
-  - [Warps](#warps-1)
-  - [Homes](#homes-1)
+    - [Warps](#warps-1)
+    - [Homes](#homes-1)
+    - [Teleport Asks](#teleport-asks-1)
 - [Permission Group Examples](#permission-group-examples)
-  - [Admin](#admin-inherits-from-moderator)
-  - [Moderator](#moderator-inherits-from-player)
-  - [Player](#player)
+    - [Admin](#admin-inherits-from-moderator)
+    - [Moderator](#moderator-inherits-from-player)
+    - [Player](#player)
 - [Support](#support)
 - [License](#license)
 
@@ -32,7 +34,7 @@ join/leave messages, and chat formatting.
 
 - **Warps**: Set and manage warp points for easy teleportation.
 - **Homes**: Allow players to set and teleport to their homes.
-- **Teleport Asks**: Players can ask for teleportation to other players.
+- **Teleport Asks**: Players can ask to teleport to other players or request other players to teleport to them.
 - **Fly**: Toggle flight mode for yourself or other players.
 - **Vanish**: Toggle vanish mode for yourself or other players.
 - **Repair**: Repair the item in your hand.
@@ -61,14 +63,16 @@ join/leave messages, and chat formatting.
 
 1. Download the latest release of NisoPlugin.
 2. Place the `NisoPlugin.jar` file in your server's `plugins` directory.
-3. Configure the `plugins/NisoPlugin/config.yml` file to set up your PostgreSQL database connection and customize messages.
+3. Configure the `plugins/NisoPlugin/config.yml` file to set up your PostgreSQL database connection and customize
+   messages.
 4. Restart your server to load the plugin.
 
 ## Configuration
 
 ### PostgreSQL Database
 
-Configure your PostgreSQL database connection in the `config.yml` file like in [this configuration](#default-configuration) shown below.
+Configure your PostgreSQL database connection in the `config.yml` file like
+in [this configuration](#default-configuration) shown below.
 
 ### Customizable Messages
 
@@ -244,10 +248,12 @@ Autocomplete:
 
 #### Teleport Asks
 
-* **/tpask Player**: Ask a target player for teleportation.
-* **/tpaccept Player**: Accept a teleportation request from a Player.
-* **/tpdeny Player**: Deny a teleportation request from a Player.
-* **/tplist**: List all teleportation requests.
+* **/tpask Player**: Ask a target player for teleportation to them.
+* **/tpaskhere Player**: Ask a target player to teleport to you.
+* **/tpaccept [Player]**: Accept a pending teleportation request (player argument optional if only 1 request is
+  pending).
+* **/tpdeny [Player]**: Deny a pending teleportation request (player argument optional if only 1 request is pending).
+* **/tplist**: List all pending teleportation requests.
 
 ## Permissions
 
@@ -319,11 +325,13 @@ Autocomplete:
 * **niso.home.delete**: Allows players to remove home locations.
 * **niso.home.teleport**: Allows players to teleport to home locations.
 * **niso.home.list**: Allows players to list home locations.
-* **niso.home.limit-(number)**: Allows players to set a specific number (up to 50) of home locations (`niso.home.limit-3` for a max of 3 homes).
+* **niso.home.limit-(number)**: Allows players to set a specific number (up to 50) of home
+  locations (`niso.home.limit-3` for a max of 3 homes).
 
 #### Teleport Asks
 
 * **niso.tpask.use**: Allows players to ask for teleportation to other players.
+* **niso.tpaskhere.use**: Allows players to ask other players to teleport to them.
 * **niso.tpaccept.use**: Allows players to accept teleportation requests.
 * **niso.tpdeny.use**: Allows players to deny teleportation requests.
 * **niso.tplist.use**: Allows players to list teleportation requests.
@@ -374,6 +382,7 @@ Autocomplete:
 * niso.home.delete
 * niso.home.limit-3
 * niso.tpask.use
+* niso.tpaskhere.use
 * niso.tpaccept.use
 * niso.tpdeny.use
 * niso.tplist.use
@@ -385,6 +394,7 @@ the [GitHub repository](https://github.com/CuteNikki/NisoPlugin/).
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](https://www.google.com/search?q=LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](https://www.google.com/search?q=LICENSE) file for
+details.
 
 ```
