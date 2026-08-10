@@ -1,7 +1,5 @@
 package moe.niso;
 
-import java.util.Objects;
-
 import moe.niso.commands.*;
 import moe.niso.listeners.*;
 import moe.niso.managers.*;
@@ -13,6 +11,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Objects;
 
 public final class NisoPlugin extends JavaPlugin {
 
@@ -123,6 +123,7 @@ public final class NisoPlugin extends JavaPlugin {
         getCmd("god").setExecutor(new GodCommand());
         getCmd("invsee").setExecutor(new InvseeCommand());
         getCmd("tpask").setExecutor(new TeleportAskCommand());
+        getCmd("tpaskhere").setExecutor(new TeleportHereCommand());
         getCmd("tpaccept").setExecutor(new TeleportAcceptCommand());
         getCmd("tpdeny").setExecutor(new TeleportDenyCommand());
         getCmd("tplist").setExecutor(new TeleportListCommand());
@@ -158,7 +159,7 @@ public final class NisoPlugin extends JavaPlugin {
             getLogger().info(logPrefixDatabase + "PostgreSQL Driver loaded successfully");
         } catch (ClassNotFoundException e) {
             getLogger().severe(
-                logPrefixDatabase + "PostgreSQL Driver not found: " + e.getMessage());
+                    logPrefixDatabase + "PostgreSQL Driver not found: " + e.getMessage());
             getLogger().severe(logPrefixDatabase + "Disabling plugin...");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
@@ -217,7 +218,7 @@ public final class NisoPlugin extends JavaPlugin {
             packServer = new ResourcePackServer();
             packServer.start(serverPort);
             getLogger().info(
-                logPrefixManager + "Resource Pack Server started on port " + serverPort);
+                    logPrefixManager + "Resource Pack Server started on port " + serverPort);
         }
     }
 
@@ -238,11 +239,11 @@ public final class NisoPlugin extends JavaPlugin {
         final String currentVersion = VersionManager.getCurrentVersion();
         final String newestVersion = VersionManager.getNewestVersion();
         final boolean updateAvailable = VersionManager.isNewerVersion(currentVersion,
-            newestVersion);
+                newestVersion);
 
         if (updateAvailable) {
             getLogger().info(logPrefixUpdater + "New version available! (Latest: " + newestVersion
-                + ", Current: " + currentVersion + ")");
+                    + ", Current: " + currentVersion + ")");
 
             final boolean autoUpdate = getConfig().getBoolean("auto-update");
 
@@ -251,23 +252,23 @@ public final class NisoPlugin extends JavaPlugin {
 
                 if (VersionManager.downloadUpdate()) {
                     getLogger().info(logPrefixUpdater
-                        + "Download successful! Restart the server to apply changes.");
+                            + "Download successful! Restart the server to apply changes.");
                 } else {
                     getLogger().warning(
-                        logPrefixUpdater + "Download failed! Check the console for errors.");
+                            logPrefixUpdater + "Download failed! Check the console for errors.");
                 }
 
             } else {
                 // Update is available but auto-update is disabled
                 getLogger().info(logPrefixUpdater + "Download the update at: "
-                    + VersionManager.getDownloadURL());
+                        + VersionManager.getDownloadURL());
             }
 
         } else {
             // No update available
             getLogger().info(
-                logPrefixUpdater + "Plugin is up to date! (Latest: " + newestVersion + ", Current: "
-                    + currentVersion + ")");
+                    logPrefixUpdater + "Plugin is up to date! (Latest: " + newestVersion + ", Current: "
+                            + currentVersion + ")");
         }
     }
 
@@ -280,7 +281,7 @@ public final class NisoPlugin extends JavaPlugin {
      */
     private PluginCommand getCmd(String name) {
         return Objects.requireNonNull(getCommand(name),
-            "Command '" + name + "' is not registered in plugin.yml");
+                "Command '" + name + "' is not registered in plugin.yml");
     }
 
     /**
@@ -318,7 +319,7 @@ public final class NisoPlugin extends JavaPlugin {
      */
     public Component prefixMessage(Component component) {
         return MiniMessage.miniMessage()
-            .deserialize(Objects.requireNonNull(getConfig().getString("message-prefix")))
-            .append(component);
+                .deserialize(Objects.requireNonNull(getConfig().getString("message-prefix")))
+                .append(component);
     }
 }

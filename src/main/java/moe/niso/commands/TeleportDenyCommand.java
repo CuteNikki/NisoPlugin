@@ -28,25 +28,43 @@ public class TeleportDenyCommand implements TabExecutor {
             return true;
         }
 
-        if (args.length != 1) {
-            player.sendMessage(plugin.prefixMessage(Component.text("Usage: /tpdeny <player>").color(NamedTextColor.RED)));
-            return true;
-        }
+        Player target;
 
-        Player target = plugin.getServer().getPlayer(args[0]);
+        if (args.length == 0) {
+            List<Player> pending = TeleportAskManager.getValidPendingRequests(player);
 
-        if (target == null || !target.isOnline()) {
-            player.sendMessage(plugin.prefixMessage(Component.text("Player not found!").color(NamedTextColor.RED)));
-            return true;
-        }
+            if (pending.isEmpty()) {
+                player.sendMessage(plugin.prefixMessage(Component.text("You have no pending teleport requests!").color(NamedTextColor.RED)));
+                return true;
+            }
 
-        if (target.getUniqueId().equals(player.getUniqueId())) {
-            player.sendMessage(plugin.prefixMessage(Component.text("You cannot teleport to yourself!").color(NamedTextColor.RED)));
-            return true;
-        }
+            if (pending.size() > 1) {
+                player.sendMessage(plugin.prefixMessage(Component.text("You have multiple pending requests! Usage: /tpdeny <player>").color(NamedTextColor.RED)));
+                return true;
+            }
 
-        if (TeleportAskManager.hasRequest(player, target)) {
-            player.sendMessage(plugin.prefixMessage(Component.text("You do not have a pending request from").color(NamedTextColor.RED).appendSpace().append(Component.text(target.getName()).color(NamedTextColor.YELLOW)).append(Component.text(".").color(NamedTextColor.RED))));
+            target = pending.getFirst();
+        } else if (args.length == 1) {
+            target = plugin.getServer().getPlayer(args[0]);
+
+            if (target == null || !target.isOnline()) {
+                player.sendMessage(plugin.prefixMessage(Component.text("Player not found!").color(NamedTextColor.RED)));
+                return true;
+            }
+
+            if (target.getUniqueId().equals(player.getUniqueId())) {
+                player.sendMessage(plugin.prefixMessage(Component.text("You cannot teleport to yourself!").color(NamedTextColor.RED)));
+                return true;
+            }
+
+            if (TeleportAskManager.hasNoRequest(player, target)) {
+                player.sendMessage(plugin.prefixMessage(Component.text("You do not have a pending request from").color(NamedTextColor.RED)
+                        .appendSpace().append(Component.text(target.getName()).color(NamedTextColor.YELLOW))
+                        .append(Component.text(".").color(NamedTextColor.RED))));
+                return true;
+            }
+        } else {
+            player.sendMessage(plugin.prefixMessage(Component.text("Usage: /tpdeny [player]").color(NamedTextColor.RED)));
             return true;
         }
 
@@ -54,11 +72,10 @@ public class TeleportDenyCommand implements TabExecutor {
         return true;
     }
 
-
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
-        if (args.length == 1) {
-            return plugin.getServer().getOnlinePlayers().stream()
+        if (args.length == 1 && sender instanceof Player player) {
+            return TeleportAskManager.getValidPendingRequests(player).stream()
                     .map(Player::getName)
                     .filter(name -> name.toLowerCase().startsWith(args[0].toLowerCase()))
                     .toList();

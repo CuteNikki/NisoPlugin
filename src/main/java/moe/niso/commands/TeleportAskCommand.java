@@ -45,7 +45,7 @@ public class TeleportAskCommand implements TabExecutor {
             return true;
         }
 
-        TeleportAskManager.sendRequest(player, target);
+        TeleportAskManager.sendRequest(player, target, false);
         return true;
     }
 

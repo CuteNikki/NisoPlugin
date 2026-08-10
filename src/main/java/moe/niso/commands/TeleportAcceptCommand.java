@@ -43,7 +43,7 @@ public class TeleportAcceptCommand implements TabExecutor {
                 return true;
             }
 
-            target = pending.get(0);
+            target = pending.getFirst();
         } else if (args.length == 1) {
             target = plugin.getServer().getPlayer(args[0]);
 
@@ -57,7 +57,7 @@ public class TeleportAcceptCommand implements TabExecutor {
                 return true;
             }
 
-            if (!TeleportAskManager.hasRequest(player, target)) {
+            if (TeleportAskManager.hasNoRequest(player, target)) {
                 player.sendMessage(plugin.prefixMessage(Component.text("You do not have a pending request from").color(NamedTextColor.RED)
                         .appendSpace().append(Component.text(target.getName()).color(NamedTextColor.YELLOW))
                         .append(Component.text(".").color(NamedTextColor.RED))));
@@ -74,8 +74,8 @@ public class TeleportAcceptCommand implements TabExecutor {
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
-        if (args.length == 1) {
-            return plugin.getServer().getOnlinePlayers().stream()
+        if (args.length == 1 && sender instanceof Player player) {
+            return TeleportAskManager.getValidPendingRequests(player).stream()
                     .map(Player::getName)
                     .filter(name -> name.toLowerCase().startsWith(args[0].toLowerCase()))
                     .toList();
