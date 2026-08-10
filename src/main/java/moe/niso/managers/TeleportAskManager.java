@@ -34,7 +34,10 @@ public class TeleportAskManager {
 
             if (System.currentTimeMillis() < expiresAt) {
                 long secondsLeft = (expiresAt - System.currentTimeMillis()) / 1000;
-                sender.sendMessage(plugin.prefixMessage(Component.text("You already have a pending request to").color(NamedTextColor.RED).appendSpace().append(Component.text(target.getName()).color(NamedTextColor.YELLOW)).append(Component.text(".").color(NamedTextColor.RED)).appendSpace().append(Component.text("Please wait " + secondsLeft + " seconds.").color(NamedTextColor.RED))));
+                sender.sendMessage(plugin.prefixMessage(Component.text("You already have a pending request to").color(NamedTextColor.RED)
+                        .appendSpace().append(Component.text(target.getName()).color(NamedTextColor.YELLOW))
+                        .append(Component.text(".").color(NamedTextColor.RED))
+                        .appendSpace().append(Component.text("Please wait " + secondsLeft + " seconds.").color(NamedTextColor.RED))));
                 return;
             } else {
                 // expired but still stored - remove it
@@ -47,7 +50,15 @@ public class TeleportAskManager {
         requestsForTarget.put(senderId, expirationTime);
 
         sender.sendMessage(plugin.prefixMessage(Component.text("Teleport request sent to").color(NamedTextColor.GREEN).appendSpace().append(Component.text(target.getName()).color(NamedTextColor.YELLOW))));
-        target.sendMessage(plugin.prefixMessage(Component.text("Teleport request received from").color(NamedTextColor.GREEN).appendSpace().append(Component.text(sender.getName()).color(NamedTextColor.YELLOW))).appendNewline().append(Component.text("[").color(NamedTextColor.DARK_GRAY)).append(Component.text("Accept").color(NamedTextColor.GREEN).hoverEvent(HoverEvent.showText(Component.text("Click to accept request from " + sender.getName()).color(NamedTextColor.GREEN))).clickEvent(ClickEvent.runCommand("/tpaccept " + sender.getName()))).append(Component.text("]").color(NamedTextColor.DARK_GRAY)).appendSpace().append(Component.text("[").color(NamedTextColor.DARK_GRAY)).append(Component.text("Deny").color(NamedTextColor.RED).hoverEvent(HoverEvent.showText(Component.text("Click to deny request from " + sender.getName()).color(NamedTextColor.RED))).clickEvent(ClickEvent.runCommand("/tpdeny " + sender.getName()))).append(Component.text("]").color(NamedTextColor.DARK_GRAY)));
+        target.sendMessage(plugin.prefixMessage(Component.text("Teleport request received from").color(NamedTextColor.GREEN).appendSpace().append(Component.text(sender.getName()).color(NamedTextColor.YELLOW)))
+                .appendNewline()
+                .append(Component.text("[").color(NamedTextColor.DARK_GRAY))
+                .append(Component.text("Accept").color(NamedTextColor.GREEN).hoverEvent(HoverEvent.showText(Component.text("Click to accept request from " + sender.getName()).color(NamedTextColor.GREEN))).clickEvent(ClickEvent.runCommand("/tpaccept " + sender.getName())))
+                .append(Component.text("]").color(NamedTextColor.DARK_GRAY))
+                .appendSpace()
+                .append(Component.text("[").color(NamedTextColor.DARK_GRAY))
+                .append(Component.text("Deny").color(NamedTextColor.RED).hoverEvent(HoverEvent.showText(Component.text("Click to deny request from " + sender.getName()).color(NamedTextColor.RED))).clickEvent(ClickEvent.runCommand("/tpdeny " + sender.getName())))
+                .append(Component.text("]").color(NamedTextColor.DARK_GRAY)));
 
         // Schedule a task to check for expiration
         new BukkitRunnable() {
@@ -108,23 +119,21 @@ public class TeleportAskManager {
     }
 
     /**
-     * Check if a teleport request exists between two players.
-     *
-     * @param receiver the player receiving the request
-     * @param sender   the player sending the request
-     * @return true if a request exists, false otherwise
+     * Check if an active, non-expired teleport request exists between two players.
      */
     public static boolean hasRequest(Player receiver, Player sender) {
         Map<UUID, Long> requestsForTarget = requests.get(receiver.getUniqueId());
-        return requestsForTarget == null || !requestsForTarget.containsKey(sender.getUniqueId());
+        if (requestsForTarget == null || !requestsForTarget.containsKey(sender.getUniqueId())) {
+            return false;
+        }
+        long expiration = requestsForTarget.get(sender.getUniqueId());
+        if (System.currentTimeMillis() >= expiration) {
+            removeRequest(receiver, sender);
+            return false;
+        }
+        return true;
     }
 
-    /**
-     * Remove a teleport request between two players.
-     *
-     * @param receiver the player receiving the request
-     * @param sender   the player sending the request
-     */
     public static void removeRequest(Player receiver, Player sender) {
         Map<UUID, Long> requestsForTarget = requests.get(receiver.getUniqueId());
         if (requestsForTarget != null) {
@@ -134,20 +143,40 @@ public class TeleportAskManager {
     }
 
     /**
-     * Get a list of players who have sent requests to the target player.
-     *
-     * @param player the target player
-     * @return a list of player names who have sent requests
+     * Retrieves active, online pending senders for a receiver, automatically cleaning up expired ones.
      */
-    public static List<String> getRequests(Player player) {
-        Map<UUID, Long> requestsForTarget = requests.get(player.getUniqueId());
-        if (requestsForTarget != null) {
-            return requestsForTarget.keySet().stream()
-                    .map(uuid -> plugin.getServer().getPlayer(uuid))
-                    .filter(Objects::nonNull)
-                    .map(Player::getName)
-                    .toList();
+    public static List<Player> getValidPendingRequests(Player receiver) {
+        Map<UUID, Long> requestsForTarget = requests.get(receiver.getUniqueId());
+        if (requestsForTarget == null || requestsForTarget.isEmpty()) {
+            return List.of();
         }
-        return List.of();
+
+        long now = System.currentTimeMillis();
+        List<Player> senders = new ArrayList<>();
+
+        Iterator<Map.Entry<UUID, Long>> iterator = requestsForTarget.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<UUID, Long> entry = iterator.next();
+            if (now >= entry.getValue()) {
+                iterator.remove();
+                continue;
+            }
+            Player sender = plugin.getServer().getPlayer(entry.getKey());
+            if (sender != null && sender.isOnline()) {
+                senders.add(sender);
+            }
+        }
+
+        if (requestsForTarget.isEmpty()) {
+            requests.remove(receiver.getUniqueId());
+        }
+
+        return senders;
+    }
+
+    public static List<String> getRequests(Player player) {
+        return getValidPendingRequests(player).stream()
+                .map(Player::getName)
+                .toList();
     }
 }
