@@ -50,7 +50,7 @@ join/leave messages, and chat formatting.
 - **Customizable Join/Leave Messages**: Customize join and leave messages with MiniMessage and PlaceholderAPI support.
 - **Customizable Chat Format**: Customize the chat format using MiniMessage.
 - **Customizable Tablist**: Set a custom tablist header and footer using MiniMessage and PlaceholderAPI.
-- **Automatic Updates**: Automatically downloads the latest release of the plugin.
+- **Automatic Updates**: Downloads new releases into the server's update folder, so the next restart applies them.
 - **Config Health Check**: Adds settings that are missing after an update, replaces invalid values with their
   defaults, and keeps the comments explaining each setting up to date. A config with a syntax error is left as it is.
 
