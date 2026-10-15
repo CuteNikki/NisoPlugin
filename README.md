@@ -51,13 +51,15 @@ join/leave messages, and chat formatting.
 - **Customizable Chat Format**: Customize the chat format using MiniMessage.
 - **Customizable Tablist**: Set a custom tablist header and footer using MiniMessage and PlaceholderAPI.
 - **Automatic Updates**: Automatically downloads the latest release of the plugin.
-- **Config Health Check**: Checks the configuration file for errors and missing values.
+- **Config Health Check**: Adds settings that are missing after an update, replaces invalid values with their
+  defaults, and keeps the comments explaining each setting up to date. A config with a syntax error is left as it is.
 
 ## Requirements
 
 - **[PaperMC](https://papermc.io/)**: version 26.2!
 - **[PostgreSQL Database](https://www.postgresql.org/)**: to store warps and homes.
 - **[PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/)**: for placeholders in various places.
+- **[LuckPerms](https://luckperms.net/)**: for prefixes and permissions.
 
 ## Installation
 
@@ -107,7 +109,7 @@ tablist:
   # keep this value between 20 and 1000 ticks to prevent issues
   update-interval: 100
   header: |-
-    <dark_gray>  <strikethrough> ]                                                 [ <reset>  <dark_gray>
+    <dark_gray>  <strikethrough> ]                                                                  [ <reset>  <dark_gray>
     <gray>
     <gradient:#FF5CCC:#743296>mc.niso.moe
     <gray>
@@ -116,7 +118,7 @@ tablist:
     <gray>TPS: <green>%server_tps_15% <dark_gray>| <gray>Your Ping: <green>%player_ping%ms
     <gray>Players: <green>%server_online%<dark_gray>/<green>%server_max_players% <dark_gray>| <gray>Uptime: <green>%server_uptime%
     <gray>
-    <dark_gray>  <strikethrough> ]                                                 [ <reset>  <dark_gray>
+    <dark_gray>  <strikethrough> ]                                                                  [ <reset>  <dark_gray>
 
 # Welcome Message Configuration
 welcome-message:
@@ -165,8 +167,20 @@ database:
   database: minecraft
   username: username
   password: super_secret
-  pool-size: 10
+  # The most connections the plugin opens at once, and how many it keeps open when it's idle
+  pool-size: 3
+  minimum-idle: 1
 
+# Resource Pack Configuration
+#
+# To enable the resource pack, set 'enabled' to true and put a resource pack in the same folder as this config.
+resource-pack:
+  enabled: false
+  server-ip: localhost
+  server-port: 8080
+  file-name: resource_pack.zip
+  prompt-message: <red>Resource Pack Download</red>
+  force-download: false
 ```
 
 ## Images
