@@ -238,6 +238,10 @@ public final class NisoPlugin extends JavaPlugin {
     private void updateCheck() {
         final String currentVersion = VersionManager.getCurrentVersion();
         final String newestVersion = VersionManager.getNewestVersion();
+        if (newestVersion == null) {
+            getLogger().warning(logPrefixUpdater + "Skipping the update check, try again on the next restart.");
+            return;
+        }
         final boolean updateAvailable = VersionManager.isNewerVersion(currentVersion,
                 newestVersion);
 

@@ -66,7 +66,7 @@ public class VersionManager {
     /**
      * Gets the newest version of the plugin from GitHub.
      *
-     * @return The newest version
+     * @return The newest version, or null if GitHub couldn't be reached
      */
     public static String getNewestVersion() {
         String version = null;
@@ -92,10 +92,9 @@ public class VersionManager {
                 plugin.getLogger().warning(plugin.logPrefixUpdater + "Failed to fetch latest version. Response code: " + connection.getResponseCode());
             }
         } catch (Exception e) {
-            plugin.getLogger().severe(plugin.logPrefixUpdater + "Error fetching latest version: " + e.getMessage());
-            plugin.getLogger().severe(plugin.logPrefixUpdater + "Disabling plugin...");
-            Bukkit.getPluginManager().disablePlugin(plugin);
-            return "";
+            // Not being able to check for updates shouldn't stop the plugin from working
+            plugin.getLogger().warning(plugin.logPrefixUpdater + "Error fetching latest version: " + e.getMessage());
+            return null;
         }
         return version;
     }
