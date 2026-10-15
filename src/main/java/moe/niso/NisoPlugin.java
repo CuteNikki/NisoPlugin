@@ -73,7 +73,7 @@ public final class NisoPlugin extends JavaPlugin {
         tablistManager = new TablistManager();
         // Start the vanish manager
         vanishManager = new VanishManager(this);
-        // Load vanished players from config
+        // Load vanished players from the database
         vanishManager.loadVanishedPlayers();
 
         // Start cache cleanup
@@ -97,11 +97,6 @@ public final class NisoPlugin extends JavaPlugin {
         // Stop the tablist manager
         if (tablistManager != null) {
             tablistManager.stop();
-        }
-
-        // Save vanished players to config
-        if (vanishManager != null) {
-            vanishManager.saveVanishedPlayers();
         }
 
         stopResourcePackServer();
@@ -176,6 +171,7 @@ public final class NisoPlugin extends JavaPlugin {
         // Create tables if they don't exist
         databaseManager.createHomesTable();
         databaseManager.createWarpsTable();
+        databaseManager.createVanishedPlayersTable();
     }
 
     /**

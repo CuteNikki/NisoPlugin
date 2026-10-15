@@ -110,4 +110,19 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Creates the table of vanished players in the database.
+     */
+    public void createVanishedPlayersTable() {
+        try (Connection connection = dataSource.getConnection()) {
+            // Create the vanished players table if it doesn't exist
+            final String vanishedPlayersTableSQL = "CREATE TABLE IF NOT EXISTS vanished_players (" + "player_uuid UUID NOT NULL, " + "vanished_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " + "PRIMARY KEY (player_uuid)" + ");";
+            try (PreparedStatement ps = connection.prepareStatement(vanishedPlayersTableSQL)) {
+                ps.executeUpdate();
+                plugin.getLogger().info(plugin.logPrefixDatabase + "Vanished players table created (if it didn't exist).");
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().warning(plugin.logPrefixDatabase + "Error creating Vanished players table: " + e.getMessage());
+        }
+    }
 }
