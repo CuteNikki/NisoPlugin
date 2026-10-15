@@ -11,6 +11,7 @@ import net.kyori.adventure.resource.ResourcePackRequest;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -122,11 +123,11 @@ public class JoinListener implements Listener {
         // Check if player is op, an update is available and then notify the player
         if (player.isOp() && plugin.getConfig().getBoolean("update-notifications")) {
             final String currentVersion = VersionManager.getCurrentVersion();
-            final String newestVersion = VersionManager.getNewestVersion();
-            final boolean updateAvailable = VersionManager.isNewerVersion(currentVersion,
-                    newestVersion);
+            // Asking GitHub can take a moment, so it happens off the main thread instead of holding up the server
+            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                final String newestVersion = VersionManager.getNewestVersion();
+                if (newestVersion == null || !VersionManager.isNewerVersion(currentVersion, newestVersion)) return;
 
-            if (updateAvailable) {
                 final Component updateMessageComponent = Component.text(
                                 "An update for the plugin is available!").color(NamedTextColor.GREEN)
                         .append(Component.newline()).append(
@@ -134,8 +135,10 @@ public class JoinListener implements Listener {
                                         .color(NamedTextColor.RED)).append(Component.newline()).append(
                                 Component.text("Newest version: " + newestVersion)
                                         .color(NamedTextColor.AQUA));
-                player.sendMessage(plugin.prefixMessage(updateMessageComponent));
-            }
+                Bukkit.getScheduler().runTask(plugin, () -> {
+                    if (player.isOnline()) player.sendMessage(plugin.prefixMessage(updateMessageComponent));
+                });
+            });
         }
 
         // Updating the tablist
