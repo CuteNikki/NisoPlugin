@@ -2,12 +2,18 @@ package moe.niso.managers;
 
 import moe.niso.NisoPlugin;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.json.JSONObject;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 public class VersionManager {
     private static final NisoPlugin plugin = NisoPlugin.getInstance();
@@ -100,54 +106,70 @@ public class VersionManager {
     }
 
     /**
-     * Downloads the newest update from GitHub.
+     * Downloads a version from GitHub into the server's update folder (plugins/update), under the same file name as
+     * the running jar. Paper swaps it in on the next start, so one restart applies it, and the running jar is never
+     * overwritten. The download is only kept if it's a jar of the expected version.
      *
+     * @param version The version to download, e.g. v1.5.5
      * @return True if the update was downloaded successfully, false otherwise
      */
-    public static boolean downloadUpdate() {
-        final File file = new File("plugins/" + plugin.getPluginMeta().getName() + ".jar");
-
-        if (!file.exists()) {
-            plugin.getLogger().warning(plugin.logPrefixUpdater + "File not found! Trying to create...");
-            try {
-                if (!file.createNewFile()) {
-                    plugin.getLogger().severe(plugin.logPrefixUpdater + "Failed to create file.");
-                    plugin.getLogger().severe(plugin.logPrefixUpdater + "Disabling plugin...");
-                    Bukkit.getPluginManager().disablePlugin(plugin);
-                    return false;
-                }
-            } catch (IOException e) {
-                plugin.getLogger().severe(plugin.logPrefixUpdater + "Error creating file: " + e.getMessage());
-                plugin.getLogger().severe(plugin.logPrefixUpdater + "Disabling plugin...");
-                Bukkit.getPluginManager().disablePlugin(plugin);
-                return false;
-            }
-        }
+    public static boolean downloadUpdate(String version) {
+        final File updateFolder = Bukkit.getUpdateFolderFile();
+        final File target = new File(updateFolder, plugin.getJarFile().getName());
+        final File partial = new File(updateFolder, target.getName() + ".part");
+        final String url = "https://github.com/" + repositoryOwner + "/" + plugin.getPluginMeta().getName() + "/releases/download/" + version + "/" + plugin.getPluginMeta().getName() + ".jar";
 
         try {
-            final URI uri = new URI(getDownloadURL());
-            final HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
+            Files.createDirectories(updateFolder.toPath());
 
-            connection.connect();
-
-            final FileOutputStream outputStream = new FileOutputStream(file);
-            final InputStream inputStream = connection.getInputStream();
-
-            final byte[] buffer = new byte[1024];
-            int readBytes;
-
-            while ((readBytes = inputStream.read(buffer)) > 0) {
-                outputStream.write(buffer, 0, readBytes);
+            final HttpURLConnection connection = (HttpURLConnection) new URI(url).toURL().openConnection();
+            connection.setConnectTimeout(10_000);
+            connection.setReadTimeout(30_000);
+            try {
+                if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                    plugin.getLogger().warning(plugin.logPrefixUpdater + "Download failed. Response code: " + connection.getResponseCode());
+                    return false;
+                }
+                try (InputStream inputStream = connection.getInputStream()) {
+                    Files.copy(inputStream, partial.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                }
+            } finally {
+                connection.disconnect();
             }
 
-            outputStream.close();
-            inputStream.close();
-            connection.disconnect();
+            // A failed or cut-off download must never end up where Paper would load it
+            final String downloadedVersion = readPluginVersion(partial);
+            if (!version.equals("v" + downloadedVersion)) {
+                plugin.getLogger().warning(plugin.logPrefixUpdater + "The download isn't " + version + " (found " + downloadedVersion + "), so it was discarded.");
+                Files.deleteIfExists(partial.toPath());
+                return false;
+            }
+
+            Files.move(partial.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
             plugin.getLogger().info(plugin.logPrefixUpdater + "Update downloaded successfully!");
             return true;
         } catch (IOException | URISyntaxException e) {
             plugin.getLogger().severe(plugin.logPrefixUpdater + "Error downloading file: " + e.getMessage());
+            partial.delete();
             return false;
+        }
+    }
+
+    /**
+     * Reads the version from a plugin jar's plugin.yml.
+     *
+     * @param jar The jar to read
+     * @return The version, or null if the file isn't a plugin jar
+     */
+    private static String readPluginVersion(File jar) {
+        try (JarFile jarFile = new JarFile(jar)) {
+            final JarEntry entry = jarFile.getJarEntry("plugin.yml");
+            if (entry == null) return null;
+            try (Reader reader = new InputStreamReader(jarFile.getInputStream(entry), StandardCharsets.UTF_8)) {
+                return YamlConfiguration.loadConfiguration(reader).getString("version");
+            }
+        } catch (IOException e) {
+            return null;
         }
     }
 }

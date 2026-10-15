@@ -12,6 +12,7 @@ import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.Objects;
 
 public final class NisoPlugin extends JavaPlugin {
@@ -254,7 +255,7 @@ public final class NisoPlugin extends JavaPlugin {
             if (autoUpdate) {
                 getLogger().info(logPrefixUpdater + "Starting automatic download...");
 
-                if (VersionManager.downloadUpdate()) {
+                if (VersionManager.downloadUpdate(newestVersion)) {
                     getLogger().info(logPrefixUpdater
                             + "Download successful! Restart the server to apply changes.");
                 } else {
@@ -293,6 +294,13 @@ public final class NisoPlugin extends JavaPlugin {
      *
      * @return DatabaseManager instance
      */
+    /**
+     * The plugin's jar file, e.g. plugins/NisoPlugin.jar.
+     */
+    public File getJarFile() {
+        return getFile();
+    }
+
     public DatabaseManager getDatabaseManager() {
         return databaseManager;
     }
