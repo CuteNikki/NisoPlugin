@@ -1,0 +1,39 @@
+name: Release
+
+# Pushing a version tag (e.g. v1.5.4) builds the plugin and publishes it as the latest release, which servers with
+# auto-update enabled download on their next start.
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+
+      # The updater compares the tag against the version in plugin.yml, which comes from pom.xml
+      - name: Check the tag matches pom.xml
+        run: |
+          VERSION=$(mvn -B -q help:evaluate -Dexpression=project.version -DforceStdout)
+          if [ "v$VERSION" != "$GITHUB_REF_NAME" ]; then
+            echo "Tag $GITHUB_REF_NAME doesn't match version $VERSION in pom.xml"
+            exit 1
+          fi
+
+      - name: Build
+        run: mvn -B package
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" target/NisoPlugin.jar --title "$GITHUB_REF_NAME" --generate-notes
