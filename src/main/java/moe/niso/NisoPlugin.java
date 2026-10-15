@@ -59,6 +59,8 @@ public final class NisoPlugin extends JavaPlugin {
         initialisePlaceholderAPI();
         initialiseLuckPerms();
         initialiseResourcePackServer();
+        // One of them failed and disabled the plugin, so there's nothing left to start
+        if (!isEnabled()) return;
 
         // Checking for a new version
         updateCheck();
@@ -168,6 +170,8 @@ public final class NisoPlugin extends JavaPlugin {
         // Initialize and set up database manager
         databaseManager = new DatabaseManager();
         databaseManager.setupDatabase();
+        // Setting up the pool failed and disabled the plugin
+        if (!isEnabled()) return;
 
         // Create tables if they don't exist
         databaseManager.createHomesTable();
