@@ -4,61 +4,83 @@ import moe.niso.NisoPlugin;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
 
 public class ConfigManager {
     private static final NisoPlugin plugin = NisoPlugin.getInstance();
 
     /**
-     * Checks the default configuration file and creates it if it doesn't exist.
+     * Allowed ranges for number values, as {min, max}. Values outside them are replaced with the default.
+     */
+    private static final Map<String, int[]> RANGES = Map.of(
+            "tablist.update-interval", new int[]{20, 1000},
+            "database.port", new int[]{1, 65535},
+            "database.pool-size", new int[]{1, 50},
+            "database.minimum-idle", new int[]{0, 50},
+            "resource-pack.server-port", new int[]{1, 65535}
+    );
+
+    /**
+     * Creates the config file if it doesn't exist. Otherwise, checks it against the default config bundled with the
+     * plugin: missing values are added, values of the wrong type or outside their range are replaced with the default,
+     * and the comments on its settings are brought up to date. Values the default config doesn't have are left alone
+     * with their comments.
      */
     public static void checkDefaultConfig() {
-
         final File configFile = new File(plugin.getDataFolder(), "config.yml");
 
         if (!configFile.exists()) {
             plugin.getLogger().info("Config file not found, creating default config...");
             plugin.saveDefaultConfig();
             return;
-        } else {
-            plugin.getLogger().info("Config file found, checking for missing values...");
+        }
+        plugin.getLogger().info("Config file found, checking for missing or invalid values...");
+
+        final YamlConfiguration defaults = loadDefaults();
+        if (defaults == null) return;
+        final YamlConfiguration config = new YamlConfiguration();
+        try {
+            config.load(configFile);
+        } catch (Exception e) {
+            // Checking it would mean overwriting every setting with its default
+            plugin.getLogger().severe("config.yml couldn't be read, so it's left as it is. Fix it and restart: "
+                    + e.getMessage());
+            return;
         }
 
-        final YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);
+        boolean changed = false;
+        for (String key : defaults.getKeys(true)) {
+            if (defaults.isConfigurationSection(key)) continue;
 
-        validateConfigKey(config, "auto-update", true, Type.BOOLEAN);
-        validateConfigKey(config, "update-notifications", true, Type.BOOLEAN);
-        validateConfigKey(config, "debug", false, Type.BOOLEAN);
-        validateConfigKey(config, "message-prefix", "<dark_gray>[<gradient:#FF5CCC:#743296>Niso<dark_gray>] <reset>", Type.STRING);
-        validateConfigKey(config, "tablist.enabled", false, Type.BOOLEAN);
-        validateConfigKey(config, "tablist.update-interval", 100, Type.INT);
-        validateConfigKey(config, "tablist.header", "<dark_gray><strikethrough> ]                                                                  [ <reset>\n<gray>\n<gradient:#FF5CCC:#743296>mc.niso.moe\n<gray>", Type.STRING);
-        validateConfigKey(config, "tablist.footer", "<gray>\n<gray>TPS: <green>%server_tps_15% <dark_gray>| <gray>Your Ping: <green>%player_ping%ms\n<gray>Players: <green>%server_online% <dark_gray>| <gray>Uptime: <green>%server_uptime%\n<gray>\n<dark_gray><strikethrough> ]                                                                  [ <reset>", Type.STRING);
-        validateConfigKey(config, "welcome-message.enabled", false, Type.BOOLEAN);
-        validateConfigKey(config, "welcome-message.personal-message.enabled", true, Type.BOOLEAN);
-        validateConfigKey(config, "welcome-message.personal-message.message", "<gray>Welcome to the server, <green>%player_name%<gray>!", Type.STRING);
-        validateConfigKey(config, "welcome-message.broadcast-message.enabled", true, Type.BOOLEAN);
-        validateConfigKey(config, "welcome-message.broadcast-message.message", "<dark_gray>[<green>+<dark_gray>] <gray>%player_name%", Type.STRING);
-        validateConfigKey(config, "leave-message.enabled", false, Type.BOOLEAN);
-        validateConfigKey(config, "leave-message.broadcast-message.enabled", true, Type.BOOLEAN);
-        validateConfigKey(config, "leave-message.broadcast-message.message", "<dark_gray>[<red>-<dark_gray>] <gray>%player_name%", Type.STRING);
-        validateConfigKey(config, "chat-format.enabled", false, Type.BOOLEAN);
-        validateConfigKey(config, "chat-format.format", "<gray>%player_name% <dark_gray>» <reset>%message%", Type.STRING);
-        validateConfigKey(config, "server-motd.enabled", false, Type.BOOLEAN);
-        validateConfigKey(config, "server-motd.first-line", "<gray>                     <rainbow><b>mc.niso.moe</b></rainbow>", Type.STRING);
-        validateConfigKey(config, "server-motd.second-line", "<gray>                         by Nikki</gray>", Type.STRING);
-        validateConfigKey(config, "database.host", "localhost", Type.STRING);
-        validateConfigKey(config, "database.port", 5432, Type.INT);
-        validateConfigKey(config, "database.database", "minecraft", Type.STRING);
-        validateConfigKey(config, "database.username", "username", Type.STRING);
-        validateConfigKey(config, "database.password", "super_secret", Type.STRING);
-        validateConfigKey(config, "database.pool-size", 10, Type.INT);
-        validateConfigKey(config, "resource-pack.enabled", false, Type.BOOLEAN);
-        validateConfigKey(config, "resource-pack.file-name", "resource_pack.zip", Type.STRING);
-        validateConfigKey(config, "resource-pack.server-ip", "localhost", Type.STRING);
-        validateConfigKey(config, "resource-pack.server-port", 8080, Type.INT);
-        validateConfigKey(config, "resource-pack.prompt-message", "<red>Resource Pack Download", Type.STRING);
-        validateConfigKey(config, "resource-pack.force-download", false, Type.BOOLEAN);
+            final Object defaultValue = defaults.get(key);
+            final String problem = findProblem(config, key, defaultValue);
+            if (problem == null) continue;
 
+            // Don't print passwords to the console
+            final String shown = key.endsWith("password") ? "" : " (" + defaultValue + ")";
+            plugin.getLogger().warning(key + " " + problem + ", using the default" + shown + ".");
+            config.set(key, defaultValue);
+            changed = true;
+        }
+
+        // The comments on the plugin's own settings are its documentation, so they follow the default config:
+        // configs from older versions get new and updated explanations, and deleted ones come back.
+        for (String key : defaults.getKeys(true)) {
+            if (!config.getComments(key).equals(defaults.getComments(key))) {
+                config.setComments(key, defaults.getComments(key));
+                changed = true;
+            }
+            if (!config.getInlineComments(key).equals(defaults.getInlineComments(key))) {
+                config.setInlineComments(key, defaults.getInlineComments(key));
+                changed = true;
+            }
+        }
+
+        if (!changed) return;
         try {
             config.save(configFile);
             plugin.reloadConfig();
@@ -70,30 +92,57 @@ public class ConfigManager {
     }
 
     /**
-     * Validates a key in the configuration file and adds a default value if it's missing or invalid.
+     * Loads the default config bundled with the plugin.
      *
-     * @param config       Configuration file
-     * @param key          Key to validate
-     * @param defaultValue Default value to add if the key is missing or invalid
-     * @param type         Type of the value (boolean, int, string)
+     * @return The default config, or null if it couldn't be read
      */
-    private static void validateConfigKey(YamlConfiguration config, String key, Object defaultValue, Type type) {
-        boolean isValid = switch (type) {
-            case Type.BOOLEAN -> config.isBoolean(key);
-            case Type.INT -> config.isInt(key);
-            case Type.STRING -> config.isString(key);
-        };
-
-        if (!isValid) {
-            plugin.getLogger().warning(key + " key not found or invalid in config, adding default value...");
-            config.set(key, defaultValue);
+    private static YamlConfiguration loadDefaults() {
+        try (InputStream stream = plugin.getResource("config.yml")) {
+            if (stream == null) throw new IllegalStateException("config.yml is missing from the plugin jar");
+            return YamlConfiguration.loadConfiguration(new InputStreamReader(stream, StandardCharsets.UTF_8));
+        } catch (Exception e) {
+            plugin.getLogger().severe("Failed to read the default config, skipping the config check: " + e.getMessage());
+            return null;
         }
     }
 
     /**
-     * Enum for configuration value types.
+     * Checks a value against its default.
+     *
+     * @param config       Configuration file
+     * @param key          Key to check
+     * @param defaultValue The key's value in the default config
+     * @return What's wrong with the value, or null if it's fine
      */
-    enum Type {
-        BOOLEAN, INT, STRING
+    private static String findProblem(YamlConfiguration config, String key, Object defaultValue) {
+        if (!config.contains(key)) return "is missing";
+
+        final Object value = config.get(key);
+        final boolean rightType = switch (defaultValue) {
+            case Boolean ignored -> value instanceof Boolean;
+            case Integer ignored -> value instanceof Integer;
+            case List<?> ignored -> value instanceof List<?>;
+            // Text can be anything that isn't a section or a list, e.g. a password that's only digits
+            default -> value != null && !config.isConfigurationSection(key) && !(value instanceof List<?>);
+        };
+        if (!rightType) return "is not a valid " + typeName(defaultValue);
+
+        final int[] range = RANGES.get(key);
+        if (range != null) {
+            final int number = (Integer) value;
+            if (number < range[0] || number > range[1]) {
+                return "is " + number + ", but should be between " + range[0] + " and " + range[1];
+            }
+        }
+        return null;
+    }
+
+    private static String typeName(Object defaultValue) {
+        return switch (defaultValue) {
+            case Boolean ignored -> "true or false";
+            case Integer ignored -> "whole number";
+            case List<?> ignored -> "list";
+            default -> "text";
+        };
     }
 }
