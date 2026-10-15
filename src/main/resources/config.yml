@@ -80,7 +80,9 @@ database:
   database: minecraft
   username: username
   password: super_secret
-  pool-size: 10
+  # The most connections the plugin opens at once, and how many it keeps open when it's idle
+  pool-size: 3
+  minimum-idle: 1
 
 # Resource Pack Configuration
 #

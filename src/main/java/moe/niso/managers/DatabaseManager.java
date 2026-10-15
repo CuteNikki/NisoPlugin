@@ -31,19 +31,20 @@ public class DatabaseManager {
             final String username = plugin.getConfig().getString("database.username");
             final String password = plugin.getConfig().getString("database.password");
             final int port = plugin.getConfig().getInt("database.port", 5432);
-            final int poolSize = plugin.getConfig().getInt("database.pool-size", 10);
+            final int poolSize = plugin.getConfig().getInt("database.pool-size", 3);
+            final int minimumIdle = plugin.getConfig().getInt("database.minimum-idle", 1);
 
             HikariConfig config = new HikariConfig();
             config.setJdbcUrl("jdbc:postgresql://" + host + ":" + port + "/" + database);
             config.setUsername(username);
             config.setPassword(password);
             config.setMaximumPoolSize(poolSize);
-
-            // PostgreSQL optimizations
-            config.addDataSourceProperty("cachePrepStmts", "true");
-            config.addDataSourceProperty("prepStmtCacheSize", "250");
-            config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-            config.addDataSourceProperty("useServerPrepStmts", "true");
+            // The database server is shared, so connections that aren't needed are closed after a minute
+            config.setMinimumIdle(Math.min(minimumIdle, poolSize));
+            config.setIdleTimeout(60_000);
+            config.setPoolName("NisoPlugin");
+            // Shows up in pg_stat_activity, so the server can tell these connections apart
+            config.addDataSourceProperty("ApplicationName", "NisoPlugin");
 
             // Initialize the connection pool
             dataSource = new HikariDataSource(config);
@@ -108,4 +109,5 @@ public class DatabaseManager {
             plugin.getLogger().warning(plugin.logPrefixDatabase + "Error creating Warps table: " + e.getMessage());
         }
     }
+
 }
