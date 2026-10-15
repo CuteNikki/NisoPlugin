@@ -3,7 +3,6 @@ package moe.niso.managers;
 import moe.niso.NisoPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.json.JSONObject;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -34,7 +33,7 @@ public class VersionManager {
      * @return The version URL
      */
     public static String getVersionURL() {
-        return "https://api.github.com/repos/" + repositoryOwner + "/" + plugin.getPluginMeta().getName() + "/releases/latest";
+        return "https://github.com/" + repositoryOwner + "/" + plugin.getPluginMeta().getName() + "/releases/latest";
     }
 
     /**
@@ -75,34 +74,30 @@ public class VersionManager {
      * @return The newest version, or null if GitHub couldn't be reached
      */
     public static String getNewestVersion() {
-        String version = null;
         try {
-            final URI uri = new URI(getVersionURL());
-            final HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("Accept", "application/vnd.github.v3+json");
-
-            if (connection.getResponseCode() == 200) {
-                BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                String inputLine;
-                StringBuilder content = new StringBuilder();
-                while ((inputLine = in.readLine()) != null) {
-                    content.append(inputLine);
+            // The latest release's page redirects to its tag, e.g. .../releases/tag/v1.5.4. Unlike GitHub's API, it
+            // isn't limited to 60 requests an hour per IP address.
+            final HttpURLConnection connection = (HttpURLConnection) new URI(getVersionURL()).toURL().openConnection();
+            connection.setInstanceFollowRedirects(false);
+            connection.setRequestMethod("HEAD");
+            connection.setConnectTimeout(10_000);
+            connection.setReadTimeout(10_000);
+            try {
+                final String location = connection.getHeaderField("Location");
+                final String version = location == null ? null : location.substring(location.lastIndexOf('/') + 1);
+                if (version == null || !location.contains("/releases/tag/") || !version.matches("v\\d+(\\.\\d+)*")) {
+                    plugin.getLogger().warning(plugin.logPrefixUpdater + "Failed to fetch latest version. Response code: " + connection.getResponseCode());
+                    return null;
                 }
-                in.close();
+                return version;
+            } finally {
                 connection.disconnect();
-
-                JSONObject json = new JSONObject(content.toString());
-                version = json.getString("tag_name");
-            } else {
-                plugin.getLogger().warning(plugin.logPrefixUpdater + "Failed to fetch latest version. Response code: " + connection.getResponseCode());
             }
         } catch (Exception e) {
             // Not being able to check for updates shouldn't stop the plugin from working
             plugin.getLogger().warning(plugin.logPrefixUpdater + "Error fetching latest version: " + e.getMessage());
             return null;
         }
-        return version;
     }
 
     /**
